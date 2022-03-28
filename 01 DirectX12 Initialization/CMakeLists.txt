@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.12)
+cmake_minimum_required(VERSION 3.12)
 
 
 # ------------------------------------------------------------------------------
@@ -11,7 +11,7 @@ set(HLSL_DIR "HLSL")
 # ------------------------------------------------------------------------------
 # 项目配置
 # ------------------------------------------------------------------------------
-set(CMAKE_CXX_STANDARD 17) 
+set(CMAKE_CXX_STANDARD 17)
 add_compile_definitions(UNICODE _UNICODE)
 # add_compile_definitions(_WIN32_WINNT=0x601)  # Win7系统需要取消注释
 add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
@@ -21,9 +21,24 @@ add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
 file(GLOB HEADER_FILES ./*.h)
 
+set(COMMON_SRC "../Common")
+
 aux_source_directory(. DIR_SRCS)
-add_executable(${TARGET_NAME} WIN32 ${DIR_SRCS} ${HEADER_FILES})
+aux_source_directory(${COMMON_SRC} COMMON_SOURCES)
+
+LIST(APPEND ALL_SRC
+        ${DIR_SRCS}
+        ${COMMON_SOURCES}
+        )
+
+add_executable(${TARGET_NAME} WIN32 ${ALL_SRC} ${HEADER_FILES})
+
 target_link_libraries(${TARGET_NAME} d3d11.lib dxgi.lib dxguid.lib D3DCompiler.lib winmm.lib)
+target_include_directories(${TARGET_NAME} PRIVATE ${COMMON_SRC})
+
+#message(STATUS "all src: ${ALL_SRC}")
+#message(STATUS "common include dir: ${COMMON_SRC}")
+
 # target_link_libraries(${TARGET_NAME} d2d1.lib dwrite.lib)  # 使用Direct2D需要取消注释
 
 # source_group("HLSL Files" FILES ${HLSL_FILES})
