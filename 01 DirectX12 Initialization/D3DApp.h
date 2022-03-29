@@ -1,5 +1,6 @@
 #pragma once
 
+#include "DXTrace.h"
 #include "GameTimer.h"
 #include "d3dx12.h"
 #include <DirectXMath.h>
@@ -7,7 +8,6 @@
 #include <dxgi1_4.h>
 #include <string>
 #include <wrl/client.h>
-#include "DXTrace.h"
 
 class D3DApp
 {
@@ -155,7 +155,8 @@ class D3DApp
     // 用来记录当前后台缓冲区的索引（由于利用页面翻转技术来交换前台缓冲区和后台缓冲区，
     // 所以我们需要对其进行记录，以便搞清楚哪个缓冲区才是当前正在用于渲染数据的后台缓冲区）。
     int mCurrBackBuffer = 0;
-    // ID3D12Resource 接口将物理内存与堆资源抽象组织为可处理的数据数组与多维数据，从而使 CPU 与 GPU 可以对这些资源进行读写。
+    // ID3D12Resource 接口将物理内存与堆资源抽象组织为可处理的数据数组与多维数据，从而使 CPU 与 GPU
+    // 可以对这些资源进行读写。
     ComPtr<ID3D12Resource> mSwapChainBuffer[SwapChainBufferCount];
     ComPtr<ID3D12Resource> mDepthStencilBuffer;
 

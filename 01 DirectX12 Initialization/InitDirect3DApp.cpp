@@ -1,6 +1,4 @@
 #include "D3DApp.h"
-#include <DirectXColors.h>
-using namespace DirectX;
 
 class InitDirect3DApp : public D3DApp
 {
@@ -74,26 +72,59 @@ void InitDirect3DApp::Draw(const GameTimer &gt)
     ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
 
     // 对资源的状态进行转换，将资源从呈现状态转换为渲染目标状态
-    mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
-                                                                           D3D12_RESOURCE_STATE_PRESENT,
-                                                                           D3D12_RESOURCE_STATE_RENDER_TARGET));
+    auto resourceBarrier = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_PRESENT,
+                                                                D3D12_RESOURCE_STATE_RENDER_TARGET);
+    mCommandList->ResourceBarrier(1, &resourceBarrier);
 
     // 设置视口和裁剪矩形。它们需要随着命令列表的重置而重置
     mCommandList->RSSetViewports(1, &mScreenViewport);
     mCommandList->RSSetScissorRects(1, &mScissorRect);
 
     // 清除后台缓冲区和深度缓冲区
-    mCommandList->ClearRenderTargetView(CurrentBackBufferView(), Colors::LightSteelBlue, 0, nullptr);
-    mCommandList->ClearDepthStencilView(DepthStencilView(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0,
-                                        0, nullptr);
+    FLOAT lightSteelBlue[4] = {0.690196097f, 0.768627524f, 0.870588303f, 1.000000000f};
+    mCommandList->ClearRenderTargetView(
+        // 待清除的资源 RTV
+        CurrentBackBufferView(),
+        // 定义即将为渲染目标填充的颜色
+        lightSteelBlue,
+        // pRects 数组中的元素数量。此值可以为 0。
+        0,
+        // 一个 D3D12_RECT 类型的数组，指定了渲染目标将要被清除的多个矩形区域。若设定此参数为nullptr，
+        // 则表示清除整个渲染目标。
+        nullptr);
+    mCommandList->ClearDepthStencilView(
+        // 待清除的深度/模板缓冲区 DSV
+        DepthStencilView(),
+        // 该标志用于指定即将清除的是深度缓冲区还是模板缓冲区。我们可以将此参数设置为 D3D12_CLEAR_FLAG_DEPTH
+        // 或 D3D12_CLEAR_FLAG_STENCIL，也可以用按位或运算符连接两者，表示同时清除这两种缓冲区。
+        D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
+        // 以此值来清除深度缓冲区
+        1.0f,
+        // 以此值来清除模板缓冲区
+        0,
+        // pRects 数组内的元素数量。可以将此值设置为 0。
+        0,
+        // 一个 D3D12_RECT 类型的数组，用以指定资源视图将要被清除的多个矩形区域。
+        // 将此值设置为 nullptr，则表示清除整个渲染目标。
+        nullptr);
 
-    // 指定将要渲染的缓冲区
-    mCommandList->OMSetRenderTargets(1, &CurrentBackBufferView(), true, &DepthStencilView());
+    // 设置我们希望在渲染流水线上使用的渲染目标和深度/模板缓冲区
+    mCommandList->OMSetRenderTargets(
+        // 待绑定的 RTV 数量，即 pRenderTargetDescriptors 数组中的元素个数。
+        // 在使用多渲染目标这种高级技术时会涉及此参数。就目前来说，我们总是使用一个 RTV。
+        1,
+        // 指向 RTV 数组的指针，用于指定我们希望绑定到渲染流水线上的渲染目标。
+        &CurrentBackBufferView(),
+        // 如果 pRenderTargetDescriptors 数组中的所有 RTV 对象在描述符堆中都是连续存放的，
+        // 就将此值设为 true，否则设为 false。
+        true,
+        // 指向一个 DSV 的指针，用于指定我们希望绑定到渲染流水线上的深度/模板缓冲区。
+        &DepthStencilView());
 
     // 再次对资源状态进行转换，将资源从渲染目标状态转换回呈现状态
-    mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
-                                                                           D3D12_RESOURCE_STATE_RENDER_TARGET,
-                                                                           D3D12_RESOURCE_STATE_PRESENT));
+    resourceBarrier = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET,
+                                                           D3D12_RESOURCE_STATE_PRESENT);
+    mCommandList->ResourceBarrier(1, &resourceBarrier);
 
     // 完成命令的记录
     ThrowIfFailed(mCommandList->Close());

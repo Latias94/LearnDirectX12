@@ -33,7 +33,7 @@ LIST(APPEND ALL_SRC
 
 add_executable(${TARGET_NAME} WIN32 ${ALL_SRC} ${HEADER_FILES})
 
-target_link_libraries(${TARGET_NAME} d3d11.lib dxgi.lib dxguid.lib D3DCompiler.lib winmm.lib)
+target_link_libraries(${TARGET_NAME} d3d12.lib d3d11.lib dxgi.lib dxguid.lib d3dcompiler.lib winmm.lib)
 target_include_directories(${TARGET_NAME} PRIVATE ${COMMON_SRC})
 
 #message(STATUS "all src: ${ALL_SRC}")
