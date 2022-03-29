@@ -24,8 +24,10 @@ class DxException
     int LineNumber = -1;
 };
 
-// L#x 将宏 ThrowIfFailed 的参数转换成一个 Unicode string。这样，我们就能将函数所引发的 error 输出到 message box 了。
 
+// L#x 将宏 ThrowIfFailed 的参数转换成一个 Unicode string。
+// 这样，我们就能将函数所引发的 error 输出到 message box 了。
+// https://stackoverflow.com/questions/34477263/gcc-and-clang-preprocessor-doesnt-understand-l-prefix
 #ifndef ThrowIfFailed
 #define ThrowIfFailed(x)                                                                                               \
     {                                                                                                                  \
@@ -33,7 +35,7 @@ class DxException
         std::wstring wfn = AnsiToWString(__FILE__);                                                                    \
         if (FAILED(hr__))                                                                                              \
         {                                                                                                              \
-            throw DxException(hr__, L#x, wfn, __LINE__);                                                               \
+            throw DxException(hr__, L ## #x, wfn, __LINE__);                                                               \
         }                                                                                                              \
     }
 #endif

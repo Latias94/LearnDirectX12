@@ -7,6 +7,7 @@
 #include <dxgi1_4.h>
 #include <string>
 #include <wrl/client.h>
+#include "DXTrace.h"
 
 class D3DApp
 {
@@ -97,8 +98,10 @@ class D3DApp
     // 返回当前后台缓冲区的 RTV（渲染目标视图，render target view）
     D3D12_CPU_DESCRIPTOR_HANDLE CurrentBackBufferView() const
     {
-        return CD3DX12_CPU_DESCRIPTOR_HANDLE(mRtvHeap->GetCPUDescriptorHandleForHeapStart(), mCurrBackBuffer,
-                                             mRtvDescriptorSize);
+        // CD3DX12 构造函数根据给定的偏移量找到当前后台缓冲区的 RTV
+        return CD3DX12_CPU_DESCRIPTOR_HANDLE(mRtvHeap->GetCPUDescriptorHandleForHeapStart(), // 堆中的首个句柄
+                                             mCurrBackBuffer,     // 偏移至后台缓冲区描述符句柄的索引
+                                             mRtvDescriptorSize); // 描述符所占字节的大小
     }
 
     // 返回主深度/模板缓冲区的 DSV（深度/模板视图，depth/stencil view）
@@ -149,7 +152,10 @@ class D3DApp
     ComPtr<ID3D12GraphicsCommandList> mCommandList;
 
     static const int SwapChainBufferCount = 2;
+    // 用来记录当前后台缓冲区的索引（由于利用页面翻转技术来交换前台缓冲区和后台缓冲区，
+    // 所以我们需要对其进行记录，以便搞清楚哪个缓冲区才是当前正在用于渲染数据的后台缓冲区）。
     int mCurrBackBuffer = 0;
+    // ID3D12Resource 接口将物理内存与堆资源抽象组织为可处理的数据数组与多维数据，从而使 CPU 与 GPU 可以对这些资源进行读写。
     ComPtr<ID3D12Resource> mSwapChainBuffer[SwapChainBufferCount];
     ComPtr<ID3D12Resource> mDepthStencilBuffer;
 
