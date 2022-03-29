@@ -160,8 +160,12 @@ class D3DApp
 
     D3D12_RECT mScissorRect;
 
+    // RTV 描述符表示的是渲染目标视图资源（render target view）
     UINT mRtvDescriptorSize = 0;
+    // DSV 描述符表示的是深度/模板视图资源（depth/stencil view）
     UINT mDsvDescriptorSize = 0;
+    // CBV/SRV/UAV  描述符分别表示的是常量缓冲区视图（constant buffer view）、着色器资源视图
+    //（shader resource view）和无序访问视图（unordered access view）这 3 种资源。
     UINT mCbvSrvUavDescriptorSize = 0;
 
     // 用户应该在派生类的派生构造函数中自定义这些初始值
