@@ -9,7 +9,6 @@ inline std::wstring AnsiToWString(const std::string &str)
     MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, buffer, 512);
     return std::wstring(buffer);
 }
-
 class DxException
 {
   public:
@@ -24,7 +23,6 @@ class DxException
     int LineNumber = -1;
 };
 
-
 // L#x 将宏 ThrowIfFailed 的参数转换成一个 Unicode string。
 // 这样，我们就能将函数所引发的 error 输出到 message box 了。
 // https://stackoverflow.com/questions/34477263/gcc-and-clang-preprocessor-doesnt-understand-l-prefix
@@ -35,7 +33,35 @@ class DxException
         std::wstring wfn = AnsiToWString(__FILE__);                                                                    \
         if (FAILED(hr__))                                                                                              \
         {                                                                                                              \
-            throw DxException(hr__, L ## #x, wfn, __LINE__);                                                               \
+            throw DxException(hr__, L## #x, wfn, __LINE__);                                                            \
         }                                                                                                              \
     }
 #endif
+
+/*
+#if defined(_DEBUG)
+    #ifndef Assert
+    #define Assert(x, description)                                  \
+    {                                                               \
+        static bool ignoreAssert = false;                           \
+        if(!ignoreAssert && !(x))                                   \
+        {                                                           \
+            Debug::AssertResult result = Debug::ShowAssertDialog(   \
+            (L#x), description, AnsiToWString(__FILE__), __LINE__); \
+        if(result == Debug::AssertIgnore)                           \
+        {                                                           \
+            ignoreAssert = true;                                    \
+        }                                                           \
+                    else if(result == Debug::AssertBreak)           \
+        {                                                           \
+            __debugbreak();                                         \
+        }                                                           \
+        }                                                           \
+    }
+    #endif
+#else
+    #ifndef Assert
+    #define Assert(x, description)
+    #endif
+#endif
+    */

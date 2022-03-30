@@ -108,18 +108,21 @@ void InitDirect3DApp::Draw(const GameTimer &gt)
         // 将此值设置为 nullptr，则表示清除整个渲染目标。
         nullptr);
 
+    auto currentBackBufferView = CurrentBackBufferView();
+    auto depthStencilView = DepthStencilView();
+
     // 设置我们希望在渲染流水线上使用的渲染目标和深度/模板缓冲区
     mCommandList->OMSetRenderTargets(
         // 待绑定的 RTV 数量，即 pRenderTargetDescriptors 数组中的元素个数。
         // 在使用多渲染目标这种高级技术时会涉及此参数。就目前来说，我们总是使用一个 RTV。
         1,
         // 指向 RTV 数组的指针，用于指定我们希望绑定到渲染流水线上的渲染目标。
-        &CurrentBackBufferView(),
+        &currentBackBufferView,
         // 如果 pRenderTargetDescriptors 数组中的所有 RTV 对象在描述符堆中都是连续存放的，
         // 就将此值设为 true，否则设为 false。
         true,
         // 指向一个 DSV 的指针，用于指定我们希望绑定到渲染流水线上的深度/模板缓冲区。
-        &DepthStencilView());
+        &depthStencilView);
 
     // 再次对资源状态进行转换，将资源从渲染目标状态转换回呈现状态
     resourceBarrier = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET,

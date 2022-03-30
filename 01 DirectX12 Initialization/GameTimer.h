@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdio>
 // 为了精确地度量时间，我们将采用性能计时器（performance timer。或称性能计数器，performance counter）
 // 为了计算从程序开始到某时刻的总时间，我们给程序创建了一个 GameTimer 实例。
 // 其实，我们也可以再创建一个 GameTimer 实例，把它当作一个通用的“秒表”。
