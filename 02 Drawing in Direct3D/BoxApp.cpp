@@ -1,9 +1,23 @@
 #include "D3DApp.h"
+using namespace DirectX;
+using namespace DirectX::PackedVector;
+
+struct Vertex
+{
+    XMFLOAT3 Pos;
+    XMFLOAT4 Color;
+};
+struct ObjectConstants
+{
+    XMFLOAT4X4 WorldViewProj = MathHelper::Identity4x4();
+};
 
 class BoxApp : public D3DApp
 {
   public:
     BoxApp(HINSTANCE hInstance);
+    BoxApp(const BoxApp &rhs) = delete;
+    BoxApp &operator=(const BoxApp &rhs) = delete;
     ~BoxApp();
 
     virtual bool Initialize() override;
@@ -12,6 +26,42 @@ class BoxApp : public D3DApp
     virtual void OnResize() override;
     virtual void Update(const GameTimer &gt) override;
     virtual void Draw(const GameTimer &gt) override;
+
+    virtual void OnMouseDown(WPARAM btnState, int x, int y) override;
+    virtual void OnMouseUp(WPARAM btnState, int x, int y) override;
+    virtual void OnMouseMove(WPARAM btnState, int x, int y) override;
+
+    void BuildDescriptorHeaps();
+    void BuildConstantBuffers();
+    void BuildRootSignature();
+    void BuildShadersAndInputLayout();
+    void BuildBoxGeometry();
+    void BuildPSO();
+
+  private:
+    ComPtr<ID3D12RootSignature> mRootSignature = nullptr;
+    ComPtr<ID3D12DescriptorHeap> mCbvHeap = nullptr;
+
+    //    std::unique_ptr<UploadBuffer<ObjectConstants>> mObjectCB = nullptr;
+    //
+    std::unique_ptr<MeshGeometry> mBoxGeo = nullptr;
+
+    ComPtr<ID3DBlob> mvsByteCode = nullptr;
+    ComPtr<ID3DBlob> mpsByteCode = nullptr;
+
+    std::vector<D3D12_INPUT_ELEMENT_DESC> mInputLayout;
+
+    ComPtr<ID3D12PipelineState> mPSO = nullptr;
+
+    //    XMFLOAT4X4 mWorld = MathHelper::Identity4x4();
+    //    XMFLOAT4X4 mView = MathHelper::Identity4x4();
+    //    XMFLOAT4X4 mProj = MathHelper::Identity4x4();
+
+    float mTheta = 1.5f * XM_PI;
+    float mPhi = XM_PIDIV4;
+    float mRadius = 5.0f;
+
+    POINT mLastMousePos;
 };
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
@@ -48,6 +98,9 @@ bool BoxApp::Initialize()
 {
     if (!D3DApp::Initialize())
         return false;
+
+    // 重置命令列表为执行初始化命令做好准备工作
+    ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
 
     return true;
 }
@@ -143,4 +196,96 @@ void BoxApp::Draw(const GameTimer &gt)
     // 等待此帧的命令执行完毕。当前的实现没有什么效率，也过于简单
     // 我们在后面将重新组织渲染部分的代码，以免在每一帧都要等待
     FlushCommandQueue();
+}
+void BoxApp::BuildBoxGeometry()
+{
+    // clang-format off
+    std::array<Vertex, 8> vertices =
+        {
+            Vertex({ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::White) }),
+            Vertex({ XMFLOAT3(-1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Black) }),
+            Vertex({ XMFLOAT3(+1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Red) }),
+            Vertex({ XMFLOAT3(+1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::Green) }),
+            Vertex({ XMFLOAT3(-1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Blue) }),
+            Vertex({ XMFLOAT3(-1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Yellow) }),
+            Vertex({ XMFLOAT3(+1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Cyan) }),
+            Vertex({ XMFLOAT3(+1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Magenta) })
+        };
+
+    std::array<std::uint16_t, 36> indices =
+    {
+        // 立方体前表面
+        0, 1, 2,
+        0, 2, 3,
+
+        // 立方体后表面
+        4, 6, 5,
+        4, 7, 6,
+
+        // 立方体左表面
+        4, 5, 1,
+        4, 1, 0,
+
+        // 立方体右表面
+        3, 2, 6,
+        3, 6, 7,
+
+        // 立方体上表面
+        1, 5, 6,
+        1, 6, 2,
+
+        // 立方体下表面
+        4, 0, 3,
+        4, 3, 7
+        };
+    // clang-format on
+
+    const UINT vbByteSize = (UINT)vertices.size() * sizeof(Vertex);
+    const UINT ibByteSize = (UINT)indices.size() * sizeof(std::uint16_t);
+    mBoxGeo = std::make_unique<MeshGeometry>();
+    mBoxGeo->Name = "boxGeo";
+
+    const UINT64 vbByteSize = 8 * sizeof(Vertex);
+    // 我们无须为顶点缓冲区视图创建描述符堆。
+    ComPtr<ID3D12Resource> VertexBufferGPU = nullptr;
+    ComPtr<ID3D12Resource> VertexBufferUploader = nullptr;
+    VertexBufferGPU =
+        d3dUtil::CreateDefaultBuffer(md3dDevice.Get(), mCommandList.Get(), vertices, vbByteSize, VertexBufferUploader);
+    auto vertexBufferView = D3D12_VERTEX_BUFFER_VIEW{
+        // 待创建视图的顶点缓冲区资源虚拟地址。我们可以通过 ID3D12Resource::GetGPUVirtualAddress 方法来获得此地址。
+        VertexBufferGPU->GetGPUVirtualAddress(),
+        // 待创建视图的顶点缓冲区大小（用字节表示）
+        vbByteSize,
+        // 每个顶点元素所占用的字节数
+        sizeof(Vertex)};
+    D3D12_VERTEX_BUFFER_VIEW vertexBuffers[1] = {vertexBufferView};
+    mCommandList->IASetVertexBuffers(0, 1, vertexBuffers);
+
+    // 将顶点缓冲区设置到输入槽上并不会对其执行实际的绘制操作，而是仅为顶点数据送至渲染流
+    // 水线做好准备而已。这最后一步才是通过 ID3D12GraphicsCommandList::DrawInstanced 方法真正地绘制顶点。
+    mCommandList->DrawInstanced(
+        // 每个实例要绘制的顶点数量
+        3,
+        // 用于实现一种被称作实例化（instancing）的高级技术。就目前来说，我们只绘制一个实例，因而将此参数设置为 1
+        8,
+        // 指定顶点缓冲区内第一个被绘制顶点的索引（该索引值以 0 为基准）。
+        0,
+        // 用于实现一种被称作实例化的高级技术，暂时只需将其设置为 0。
+        0);
+    // 指定顶点被定义为何种图元
+    mCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    // 索引缓冲区
+    // 我们也无须为索引缓冲区视图创建描述符堆
+    ComPtr<ID3D12Resource> IndexBufferGPU = nullptr;
+    ComPtr<ID3D12Resource> IndexBufferUploader = nullptr;
+    VertexBufferGPU =
+        d3dUtil::CreateDefaultBuffer(md3dDevice.Get(), mCommandList.Get(), vertices, vbByteSize, VertexBufferUploader);
+    auto indexBufferView = D3D12_INDEX_BUFFER_VIEW{
+        // 待创建视图的顶点缓冲区资源虚拟地址。我们可以通过 ID3D12Resource::GetGPUVirtualAddress 方法来获得此地址。
+        VertexBufferGPU->GetGPUVirtualAddress(),
+        // 待创建视图的顶点缓冲区大小（用字节表示）
+        vbByteSize,
+        // 每个顶点元素所占用的字节数
+        sizeof(Vertex)};
 }
