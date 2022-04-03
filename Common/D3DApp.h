@@ -1,12 +1,14 @@
 #pragma once
 
-#include "DXTrace.h"
 #include "GameTimer.h"
+#include "d3dUtil.h"
 #include "d3dx12.h"
 #include <DirectXMath.h>
 #include <d3d12.h>
 #include <dxgi1_4.h>
+#include <memory>
 #include <string>
+#include <vector>
 #include <wrl/client.h>
 
 class D3DApp
@@ -138,7 +140,8 @@ class D3DApp
     GameTimer mTimer;
 
     // 使用模板别名(C++11)简化类型名
-    template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
+    template <class T>
+    using ComPtr = Microsoft::WRL::ComPtr<T>;
 
     ComPtr<IDXGIFactory4> mdxgiFactory;
     ComPtr<IDXGISwapChain> mSwapChain;
@@ -171,7 +174,7 @@ class D3DApp
     UINT mRtvDescriptorSize = 0;
     // DSV 描述符表示的是深度/模板视图资源（depth/stencil view）
     UINT mDsvDescriptorSize = 0;
-    // CBV/SRV/UAV  描述符分别表示的是常量缓冲区视图（constant buffer view）、着色器资源视图
+    // CBV/SRV/UAV 描述符分别表示的是常量缓冲区视图（constant buffer view）、着色器资源视图
     //（shader resource view）和无序访问视图（unordered access view）这 3 种资源。
     UINT mCbvSrvUavDescriptorSize = 0;
 

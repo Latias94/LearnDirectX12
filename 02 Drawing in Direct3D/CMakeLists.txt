@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.12)
 # 设置项目名(不能有空格) 
 set(TARGET_NAME "02_Drawing_in_Direct3D")
 # 设置HLSL文件的存放位置
-set(HLSL_DIR "HLSL")
+set(HLSL_DIR "Shaders")
 # ------------------------------------------------------------------------------
 # 项目配置
 # ------------------------------------------------------------------------------
@@ -16,8 +16,8 @@ add_compile_definitions(UNICODE _UNICODE)
 # add_compile_definitions(_WIN32_WINNT=0x601)  # Win7系统需要取消注释
 add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
-# file(COPY HLSL DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-# file(GLOB HLSL_FILES ${HLSL_DIR}/*.hlsl)
+file(COPY ${HLSL_DIR} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(GLOB HLSL_FILES ${HLSL_DIR}/*.hlsl)
 
 file(GLOB HEADER_FILES ./*.h)
 
@@ -41,8 +41,8 @@ message(STATUS "common include dir: ${COMMON_SRC}")
 
 # target_link_libraries(${TARGET_NAME} d2d1.lib dwrite.lib)  # 使用Direct2D需要取消注释
 
-# source_group("HLSL Files" FILES ${HLSL_FILES})
-# file(COPY ${HLSL_DIR} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+source_group("HLSL Files" FILES ${HLSL_FILES})
+file(COPY ${HLSL_DIR} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 # 输出文件名
 set_target_properties(${TARGET_NAME} PROPERTIES OUTPUT_NAME ${TARGET_NAME})
@@ -57,7 +57,7 @@ set_target_properties(${TARGET_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE
 #
 # 如果需要编译期编译着色器，取消注释如下代码
 # 要求着色器命名格式为：ShaderName_ShaderType.hlsl
-# ShaderType为右边任意一种：VS, vs, HS, hs, DS, ds, GS, gs, PS, ps, CS, cs
+# ShaderType 为右边任意一种：VS, vs, HS, hs, DS, ds, GS, gs, PS, ps, CS, cs
 #
 
 # target_sources(${TARGET_NAME} ${HLSL_FILES})

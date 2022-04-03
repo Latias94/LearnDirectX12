@@ -1,6 +1,5 @@
 
 #include "D3DApp.h"
-#include "d3dUtil.h"
 #include <cassert>
 #include <vector>
 #include <windowsx.h>
