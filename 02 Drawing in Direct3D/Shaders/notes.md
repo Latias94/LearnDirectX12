@@ -9,16 +9,16 @@ pipeline）流程的一部分）离线地（offline）编译着色器。这样�
 2. 以便在早于运行时的构建处理期间提前发现编译错误。
 3. 对于 Windows 8 应用商店中的应用而言，必须采用离线编译这种方式。
 
-我们通常用 `.cso` (即 compiled shader object，已编译的着色器对象)作为已编译着色器的扩展名。
+我们通常用 `.cso` （即 compiled shader object，已编译的着色器对象）作为已编译着色器的扩展名。
 
-为了以离线的方式编译着色器，我们将使用 DirectX 自带的 FXC 命令行编译工具。为了将 `color.hlsl` 文件中分别以 VS 和 PS 作为入口点的顶点着色器和像素着色器编译为调试版本的字节码，我们可以输入以下命令：
+为了以离线的方式编译着色器，我们将使用 DirectX 自带的 FXC 命令行编译工具。为了将 `color.hlsl` 文件中分别以 VS 和 PS 作为入口点的顶点着色器和像素着色器编译为**调试**版本的字节码，我们可以输入以下命令：
 
 ```shell
 fxc "color.hlsl" /Od /Zi /T vs_5_0 /E "VS" /Fo "color_vs.cso" /Fc "color_vs.asm"
 fxc "color.hlsl" /Od /Zi /T ps_5_0 /E "PS" /Fo "color_ps.cso" /Fc "color_ps.asm"
 ```
 
-为了将 `color.hlsl` 文件中分别以 VS 和 PS 作为入口点的顶点着色器和像素着色器编译为发行版本的字节码，则可以输入以下命令：
+为了将 `color.hlsl` 文件中分别以 VS 和 PS 作为入口点的顶点着色器和像素着色器编译为**发行**版本的字节码，则可以输入以下命令：
 
 ```shell
 fxc "color.hlsl" /T vs_5_0 /E "VS" /Fo "color_vs.cso" /Fc "color_vs.asm"
