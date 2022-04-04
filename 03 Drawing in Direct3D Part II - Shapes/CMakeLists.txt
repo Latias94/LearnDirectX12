@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.12)
 # 用户配置
 # ------------------------------------------------------------------------------
 # 设置项目名(不能有空格) 
-set(TARGET_NAME "02_Drawing_in_Direct3D")
+set(TARGET_NAME "03_Drawing_in_Direct3D_Part_II-Shapes")
 # 设置HLSL文件的存放位置
 set(HLSL_DIR "Shaders")
 # ------------------------------------------------------------------------------
@@ -42,7 +42,14 @@ message(STATUS "common include dir: ${COMMON_SRC}")
 # target_link_libraries(${TARGET_NAME} d2d1.lib dwrite.lib)  # 使用Direct2D需要取消注释
 
 source_group("HLSL Files" FILES ${HLSL_FILES})
+
+# 复制 Shaders 文件夹
 file(COPY ${HLSL_DIR} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+#foreach (f ${HLSL_DIR})
+#    add_custom_command(TARGET ${TARGET_NAME} PRE_BUILD
+#            COMMAND ${CMAKE_COMMAND} -E
+#            copy ${f} ${CMAKE_CURRENT_BINARY_DIR})
+#endforeach ()
 
 # 输出文件名
 set_target_properties(${TARGET_NAME} PROPERTIES OUTPUT_NAME ${TARGET_NAME})

@@ -218,7 +218,7 @@ void D3DApp::FlushCommandQueue()
     mCurrentFence++;
 
     // 向命令队列中添加一条用来设置新围栏点的命令
-    // 由于这条命令要交由 GPU处理（即由 GPU端来修改围栏值），所以在 GPU处理完命令队列中此 Signal()
+    // 由于这条命令要交由 GPU 处理（即由 GPU 端来修改围栏值），所以在 GPU 处理完命令队列中此 Signal()
     // 以前的所有命令之前，它并不会设置新的围栏点
 
     // ID3D12CommandQueue::Signal 方法从 GPU 端设置围栏值，而 ID3D12Fence::Signal 方法则从 CPU 端设置围栏值。
