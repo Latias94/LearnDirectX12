@@ -3,6 +3,11 @@
 [生成几何体](生成几何体.md)
 
 ![](../misc/images/03-result.png)
+![](../misc/images/03-result-wireframe.png)
+
+鼠标左键控制镜头上下左右（球坐标系），鼠标右键控制距离远近。
+
+数字 1 键切换线框模式。
 
 
 ## 帧资源
