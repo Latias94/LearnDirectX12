@@ -42,7 +42,10 @@ VertexOut VS(VertexIn vin)
 {
     VertexOut vout;
     // 把顶点变换到齐次裁剪空间
-    vout.PosH = mul(float4(vin.PosL, 1.0f), gWorldViewProj);
+    // 由于 cpp 部分把物体的世界矩阵和观察裁剪矩阵分开两个常量缓冲来更新，因此这里要分开乘
+    float4 posW = mul(float4(vin.PosL, 1.0f), gWorld);
+    vout.PosH = mul(posW, gViewProj);
+
     // 直接将顶点的颜色信息传至像素着色器
     vout.Color = vin.Color;
     return vout;

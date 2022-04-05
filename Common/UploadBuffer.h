@@ -62,9 +62,9 @@ class UploadBuffer
     }
 
     // 我们利用 memcpy 函数将数据从系统内存（system memory，也就是 CPU 端控制的内存）复制到常量缓冲区
-    void CopyData(int elementIndex, const T &data)
+    void CopyData(int dstElementIndex, const T &srcData)
     {
-        memcpy(&mMappedData[elementIndex * mElementByteSize], &data, sizeof(T));
+        memcpy(&mMappedData[dstElementIndex * mElementByteSize], &srcData, sizeof(T));
     }
 
   private:

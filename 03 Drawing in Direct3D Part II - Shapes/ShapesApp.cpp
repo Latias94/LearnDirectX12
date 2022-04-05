@@ -1,8 +1,13 @@
 #include "D3DApp.h"
 #include "FrameResource.h"
+#include "GeometryGenerator.h"
 
 using namespace DirectX;
 using namespace DirectX::PackedVector;
+
+// 正如图 7.6 所示，在Shapes演示程序中，我们要绘制长方体、栅格、柱体（圆台）及球体。尽管在示例中要绘制多个球体和柱体，
+// 但实际上我们只需对一组球体和圆台数据的副本。通过利用不同的世界矩阵，对这组数据进行多次绘制，即可绘制出多个预定的球体与圆台。
+// 所以说，这也是一个几何体实例化（instancing）的范例，借助此技术可以减少内存资源的占用。
 
 // 3 个帧资源元素
 const int gNumFrameResources = 3;
@@ -15,8 +20,8 @@ struct RenderItem
     // 它定义了物体位于世界空间中的位置、朝向以及大小
     XMFLOAT4X4 World = MathHelper::Identity4x4();
 
-    // 用已更新标志（dirty flag）来表示物体的相关数据已发生改变，这意味着我们此时需要更新常量缓 冲区。
-    // 由于每个 FrameResource中都有一个物体常量缓冲区，所以我们必须对每个 FrameResource 都进行更新。
+    // 用已更新标志（dirty flag）来表示物体的相关数据已发生改变，这意味着我们此时需要更新常量缓冲区。
+    // 由于每个 FrameResource 中都有一个物体常量缓冲区，所以我们必须对每个 FrameResource 都进行更新。
     // 即，当我们修改物体数据的时候，应当按 NumFramesDirty = gNumFrameResources 进行设置，从而使每个帧资源都得到更新
     int NumFramesDirty = gNumFrameResources;
 
@@ -66,7 +71,7 @@ class ShapesApp : public D3DApp
     void UpdateMainPassCB(const GameTimer &gt);
 
     void BuildDescriptorHeaps();
-    void BuildConstantBuffers();
+    void BuildConstantBufferViews();
     void BuildRootSignature();
     void BuildShadersAndInputLayout();
     void BuildShapeGeometry();
@@ -84,6 +89,14 @@ class ShapesApp : public D3DApp
     ComPtr<ID3D12RootSignature> mRootSignature = nullptr;
     ComPtr<ID3D12DescriptorHeap> mCbvHeap = nullptr;
 
+    ComPtr<ID3D12DescriptorHeap> mSrvDescriptorHeap = nullptr;
+
+    std::unordered_map<std::string, std::unique_ptr<MeshGeometry>> mGeometries;
+    std::unordered_map<std::string, ComPtr<ID3DBlob>> mShaders;
+    std::unordered_map<std::string, ComPtr<ID3D12PipelineState>> mPSOs;
+
+    std::vector<D3D12_INPUT_ELEMENT_DESC> mInputLayout;
+
     // 存有所有渲染项的向量
     std::vector<std::unique_ptr<RenderItem>> mAllRitems;
 
@@ -91,23 +104,19 @@ class ShapesApp : public D3DApp
     std::vector<RenderItem *> mOpaqueRitems;
     //    std::vector<RenderItem*> mTransparentRitems;
 
-    std::unique_ptr<UploadBuffer<ObjectConstants>> mObjectCB = nullptr;
-    std::unique_ptr<MeshGeometry> mBoxGeo = nullptr;
+    PassConstants mMainPassCB;
 
-    ComPtr<ID3DBlob> mvsByteCode = nullptr;
-    ComPtr<ID3DBlob> mpsByteCode = nullptr;
+    UINT mPassCbvOffset = 0;
 
-    std::vector<D3D12_INPUT_ELEMENT_DESC> mInputLayout;
+    bool mIsWireframe = false;
 
-    ComPtr<ID3D12PipelineState> mPSO = nullptr;
-
-    XMFLOAT4X4 mWorld = MathHelper::Identity4x4();
+    XMFLOAT3 mEyePos = {0.0f, 0.0f, 0.0f};
     XMFLOAT4X4 mView = MathHelper::Identity4x4();
     XMFLOAT4X4 mProj = MathHelper::Identity4x4();
 
     float mTheta = 1.5f * XM_PI;
-    float mPhi = XM_PIDIV4;
-    float mRadius = 5.0f;
+    float mPhi = 0.2f * XM_PI;
+    float mRadius = 15.0f;
 
     POINT mLastMousePos;
 };
@@ -140,6 +149,8 @@ ShapesApp::ShapesApp(HINSTANCE hInstance) : D3DApp(hInstance)
 
 ShapesApp::~ShapesApp()
 {
+    if (md3dDevice != nullptr)
+        FlushCommandQueue();
 }
 
 bool ShapesApp::Initialize()
@@ -150,11 +161,13 @@ bool ShapesApp::Initialize()
     // 重置命令列表为执行初始化命令做好准备工作
     ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
 
-    BuildDescriptorHeaps();
-    BuildConstantBuffers();
     BuildRootSignature();
     BuildShadersAndInputLayout();
     BuildShapeGeometry();
+    BuildRenderItems();
+    BuildFrameResources();
+    BuildDescriptorHeaps();
+    BuildConstantBufferViews();
     BuildPSOs();
 
     // 执行初始化命令
@@ -179,47 +192,46 @@ void ShapesApp::OnResize()
 
 void ShapesApp::Update(const GameTimer &gt)
 {
-    // https://zh.wikipedia.org/wiki/%E7%90%83%E5%BA%A7%E6%A8%99%E7%B3%BB
-    // 由于摄像机涉及环绕物体旋转等操作，所以先利用球坐标表示变换（可将摄像机视为针对目标物体的可控“侦查卫星”，
-    // 用鼠标调整摄像机与物体间的距离（也就是球面半径）以及观察角度），再将其转换为笛卡儿坐标的表示更为方便。
-    // 而这一摄像机系统也被称为旋转摄像机系统（orbiting camera system，也有作环绕摄像机系统）。
-    // 顺便提一句，除了上述两种坐标系之外，圆柱坐标系（cylindrical coordinate system，也有作柱面坐标系）
-    // 有时也会派上用场，因此掌握这 3 种坐标系间的转换对实际应用也会大有裨益。
+    OnKeyboardInput(gt);
+    UpdateCamera(gt);
 
-    // 由球坐标（也有译作球面坐标）转换为笛卡儿坐标
-    // 数学中通常使用的球坐标(r, θ, φ) ：径向距离 r，方位角 θ（theta）与极角 φ（phi）
-    float x = mRadius * sinf(mPhi) * cosf(mTheta);
-    float z = mRadius * sinf(mPhi) * sinf(mTheta);
-    float y = mRadius * cosf(mPhi);
-    // 构建观察矩阵
-    XMVECTOR pos = XMVectorSet(x, y, z, 1.0f);
-    XMVECTOR target = XMVectorZero();
-    XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+    // Cycle through the circular frame resource array.
+    mCurrFrameResourceIndex = (mCurrFrameResourceIndex + 1) % gNumFrameResources;
+    mCurrFrameResource = mFrameResources[mCurrFrameResourceIndex].get();
 
-    XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
-    XMStoreFloat4x4(&mView, view);
+    // Has the GPU finished processing the commands of the current frame resource?
+    // If not, wait until the GPU has completed commands up to this fence point.
+    // 在 CPU 端等待 GPU，直到后者执行完这个围栏点之前的所有命令
+    if (mCurrFrameResource->Fence != 0 && mFence->GetCompletedValue() < mCurrFrameResource->Fence)
+    {
+        HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
+        ThrowIfFailed(mFence->SetEventOnCompletion(mCurrFrameResource->Fence, eventHandle));
+        WaitForSingleObject(eventHandle, INFINITE);
+        CloseHandle(eventHandle);
+    }
 
-    XMMATRIX world = XMLoadFloat4x4(&mWorld);
-    XMMATRIX proj = XMLoadFloat4x4(&mProj);
-    XMMATRIX worldViewProj = world * view * proj;
-
-    // 用最新的 worldViewProj 矩阵来更新常量缓冲区
-    ObjectConstants objConstants;
-    // 将数据从 XMMATRIX 内存储到 XMFLOAT4X4 中
-    XMStoreFloat4x4(&objConstants.WorldViewProj, XMMatrixTranspose(worldViewProj));
-    mObjectCB->CopyData(0, objConstants);
+    UpdateObjectCBs(gt);
+    UpdateMainPassCB(gt);
 }
 
 void ShapesApp::Draw(const GameTimer &gt)
 {
+    auto cmdListAlloc = mCurrFrameResource->CmdListAlloc;
     // 重复使用记录命令的相关内存
     // 只有当与 GPU 关联的命令列表执行完成时，我们才能将其重置
-    ThrowIfFailed(mDirectCmdListAlloc->Reset());
+    ThrowIfFailed(cmdListAlloc->Reset());
 
     // 在通过 ExecuteCommandList 方法将某个命令列表加入命令队列后，我们便可以重置该命令列表。以
     // 此来复用命令列表及其内存
     // 重置命令列表并指定初始 PSO
-    ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), mPSO.Get()));
+    if (mIsWireframe)
+    {
+        ThrowIfFailed(mCommandList->Reset(cmdListAlloc.Get(), mPSOs["opaque_wireframe"].Get()));
+    }
+    else
+    {
+        ThrowIfFailed(mCommandList->Reset(cmdListAlloc.Get(), mPSOs["opaque"].Get()));
+    }
 
     // 设置视口和裁剪矩形。它们需要随着命令列表的重置而重置
     mCommandList->RSSetViewports(1, &mScreenViewport);
@@ -278,27 +290,12 @@ void ShapesApp::Draw(const GameTimer &gt)
 
     mCommandList->SetGraphicsRootSignature(mRootSignature.Get());
 
-    auto vertexBufferView = mBoxGeo->VertexBufferView();
-    mCommandList->IASetVertexBuffers(0, 1, &vertexBufferView);
-    auto indexBufferView = mBoxGeo->IndexBufferView();
-    mCommandList->IASetIndexBuffer(&indexBufferView);
-    // 指定顶点被定义为何种图元
-    mCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    int passCbvIndex = mPassCbvOffset + mCurrFrameResourceIndex;
+    auto passCbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(mCbvHeap->GetGPUDescriptorHandleForHeapStart());
+    passCbvHandle.Offset(passCbvIndex, mCbvSrvUavDescriptorSize);
     // 令描述符表与渲染流水线相绑定。
-    mCommandList->SetGraphicsRootDescriptorTable(0, mCbvHeap->GetGPUDescriptorHandleForHeapStart());
-    // 将顶点缓冲区设置到输入槽上并不会对其执行实际的绘制操作，而是仅为顶点数据送至渲染流
-    // 水线做好准备而已。这最后一步才是通过 ID3D12GraphicsCommandList::DrawInstanced 方法真正地绘制顶点。
-    mCommandList->DrawIndexedInstanced(
-        // 每个实例将要绘制的索引数量
-        mBoxGeo->DrawArgs["box"].IndexCount,
-        // 用于实现一种被称作实例化（instancing）的高级技术。就目前来说，我们只绘制一个实例，因而将此参数设置为 1
-        1,
-        // 指向索引缓冲区中的某个元素，将其标记为欲读取的起始索引。
-        0,
-        // 在本次绘制调用读取顶点之前，要为每个索引都加上此整数值。
-        0,
-        // 用于实现一种被称作实例化的高级技术，暂时只需将其设置为 0。
-        0);
+    mCommandList->SetGraphicsRootDescriptorTable(1, passCbvHandle);
+    DrawRenderItems(mCommandList.Get(), mOpaqueRitems);
 
     // 按照资源的用途指示其状态的转变，将资源从渲染目标状态转换回呈现状态
     resourceBarrier = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET,
@@ -316,9 +313,12 @@ void ShapesApp::Draw(const GameTimer &gt)
     ThrowIfFailed(mSwapChain->Present(0, 0));
     mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
 
-    // 等待此帧的命令执行完毕。当前的实现没有什么效率，也过于简单
-    // 我们在后面将重新组织渲染部分的代码，以免在每一帧都要等待
-    FlushCommandQueue();
+    // 增加围栏值，将之前的命令标记到此围栏点上
+    mCurrFrameResource->Fence = ++mCurrentFence;
+
+    // 向命令队列添加一条指令，以设置新的围栏点 GPU 还在执行我们此前向命令队列中传入的命令，
+    // 所以，GPU 不会立即设置新的围栏点，这要等到它处理完 Signal() 函数之前的所有命令
+    mCommandQueue->Signal(mFence.Get(), mCurrentFence);
 }
 
 void ShapesApp::OnMouseDown(WPARAM btnState, int x, int y)
@@ -365,12 +365,25 @@ void ShapesApp::OnMouseMove(WPARAM btnState, int x, int y)
 }
 
 // 利用描述符将常量缓冲区绑定至渲染流水线上
+// 如果有 3 个帧资源与 n 个渲染项，那么就应存在 3n 个物体常量缓冲区（object constant buffer）
+// 以及 3 个渲染过程常量缓冲区（pass constant buffer）。因此，我们也就需要创建 3(n+1) 个常量缓冲区视图（CBV）。
+// 这样一来，我们还要修改 CBV 堆以容纳额外的描述符：
 void ShapesApp::BuildDescriptorHeaps()
 {
+    UINT objCount = (UINT)mOpaqueRitems.size();
+
+    // 我们需要为每个帧资源中的每一个物体都创建一个 CBV 描述符，obj CBV
+    // 为了容纳每个帧资源中的渲染过程 CBV 而 +1。pass CBV
+    UINT numDescriptors = (objCount + 1) * gNumFrameResources;
+
+    // 保存渲染过程 CBV 的起始偏移量。在本程序中，这是排在最后面的 3 个描述符
+    // n frame ObjCBVs | n+1 frame ObjCBVs | n+2 frame ObjCBVs | n frame passCBV | n+1 frame passCBV | n+2 frame passCBV
+    mPassCbvOffset = objCount * gNumFrameResources;
+
     // 常量缓冲区描述符要存放在以 D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV 类型所建的描述符堆里。
     // 这种堆内可以混合存储常量缓冲区描述符、着色器资源描述符和无序访问（unordered access）描述符。
     D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc;
-    cbvHeapDesc.NumDescriptors = 1;
+    cbvHeapDesc.NumDescriptors = numDescriptors;
     cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
     cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
     cbvHeapDesc.NodeMask = 0;
@@ -381,27 +394,75 @@ void ShapesApp::BuildDescriptorHeaps()
     ThrowIfFailed(md3dDevice->CreateDescriptorHeap(&cbvHeapDesc, IID_PPV_ARGS(&mCbvHeap)));
 }
 
-void ShapesApp::BuildConstantBuffers()
+// 现在，我们就可以用下列代码来填充 CBV 堆，其中描述符 0 至描述符 n−1 包含了第 0 个帧资源的物体 CBV，
+// 描述符 n 至描述符 2n−1 容纳了第 1 个帧资源的物体 CBV，以此类推，描述符 2n 至描述符 3n−1 包含了
+// 第 2 个帧资源的物体 CBV。最后，3n、3n+1 以及 3n+2 分别存有第 0 个、第 1 个和第 2 个帧资源的渲染过程 CBV：
+void ShapesApp::BuildConstantBufferViews()
 {
-    mObjectCB = std::make_unique<UploadBuffer<ObjectConstants>>(md3dDevice.Get(),
-                                                                // 此常量缓冲区存储了绘制 1 个物体所需的常量数据
-                                                                1, true);
     UINT objCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
-    // 缓冲区的起始地址（即索引为 0 的那个常量缓冲区的地址）
-    D3D12_GPU_VIRTUAL_ADDRESS cbAddress = mObjectCB->Resource()->GetGPUVirtualAddress();
+    UINT objCount = (UINT)mOpaqueRitems.size();
+    // 每个帧资源中的每一个物体都需要一个对应的 CBV 描述符
+    for (int frameIndex = 0; frameIndex < gNumFrameResources; ++frameIndex)
+    {
+        auto objectCB = mFrameResources[frameIndex]->ObjectCB->Resource();
+        for (UINT i = 0; i < objCount; ++i)
+        {
+            D3D12_GPU_VIRTUAL_ADDRESS cbAddress = objectCB->GetGPUVirtualAddress();
 
-    // 偏移到常量缓冲区中绘制第 i 个物体所需的常量数据
-    int boxCBufIndex = 0;
-    cbAddress += boxCBufIndex * objCBByteSize;
+            // 偏移到缓冲区中第 i 个物体的常量缓冲区
+            cbAddress += i * objCBByteSize;
 
-    // 如果常量缓冲区存储了一个内有 n 个物体常量数据的常量数组，那么我们就可以通过 BufferLocation 和
-    // SizeInBytes 参数来获取第 i 个物体的常量数据。考虑到硬件的需求（即硬件的最小分配空间），
-    // 成员 SizeInBytes 与 BufferLocation 必须为 256B 的整数倍。
-    // 若将上述两个成员的值都指定为 64，那么我们将看到调试错误
-    D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
-    cbvDesc.BufferLocation = cbAddress;
-    cbvDesc.SizeInBytes = objCBByteSize;
-    md3dDevice->CreateConstantBufferView(&cbvDesc, mCbvHeap->GetCPUDescriptorHandleForHeapStart());
+            // 偏移到该物体在描述符堆中的 CBV
+            int heapIndex = frameIndex * objCount + i;
+            auto handle = CD3DX12_CPU_DESCRIPTOR_HANDLE(mCbvHeap->GetCPUDescriptorHandleForHeapStart());
+            handle.Offset(heapIndex, mCbvSrvUavDescriptorSize);
+
+            // 如果常量缓冲区存储了一个内有 n 个物体常量数据的常量数组，那么我们就可以通过 BufferLocation 和
+            // SizeInBytes 参数来获取第 i 个物体的常量数据。考虑到硬件的需求（即硬件的最小分配空间），
+            // 成员 SizeInBytes 与 BufferLocation 必须为 256B 的整数倍。
+            // 若将上述两个成员的值都指定为 64，那么我们将看到调试错误
+            D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
+            cbvDesc.BufferLocation = cbAddress;
+            cbvDesc.SizeInBytes = objCBByteSize;
+
+            md3dDevice->CreateConstantBufferView(&cbvDesc, handle);
+        }
+    }
+
+    UINT passCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(PassConstants));
+
+    // 最后 3 个描述符依次是每个帧资源的渲染过程 CBV
+    // n frame ObjCBVs | n+1 frame ObjCBVs | n+2 frame ObjCBVs | n frame passCBV | n+1 frame passCBV | n+2 frame passCBV
+    for (int frameIndex = 0; frameIndex < gNumFrameResources; ++frameIndex)
+    {
+        auto passCB = mFrameResources[frameIndex]->PassCB->Resource();
+
+        // 每个帧资源的渲染过程缓冲区中只存有一个常量缓冲区
+        D3D12_GPU_VIRTUAL_ADDRESS cbAddress = passCB->GetGPUVirtualAddress();
+
+        // 偏移到描述符堆中对应的渲染过程 CBV
+        int heapIndex = mPassCbvOffset + frameIndex;
+
+        // 通过调用 ID3D12DescriptorHeap::GetCPUDescriptorHandleForHeapStart 方法，
+        // 我们可以获得堆中第一个描述符的句柄。然而，我们当前堆内所存放的描述符已不止一个，
+        // 所以仅使用此方法并不能找到其他描述符的句柄。此时，我们希望能够偏移到堆内的其他描述符处，
+        // 为此需要了解到达堆内下一个相邻描述符的增量。这个增量的大小其实是由硬件来确定的，
+        // 所以我们必须从设备上查询相关的信息。此外，该增量还依赖于堆的具体类型。这里增量为： mCbvSrvUavDescriptorSize
+        // 只要知道了相邻描述符之间的增量大小，就能通过两种 CD3DX12_CPU_DESCRIPTOR_HANDLE::Offset 方法之一偏
+        // 移到第 n 个描述符的句柄处：
+
+        // 指定要偏移到的目标描述符的编号，将它与相邻描述符之间的增量相乘，以此来找到第 n 个描述符的句柄
+        auto handle = CD3DX12_CPU_DESCRIPTOR_HANDLE(mCbvHeap->GetCPUDescriptorHandleForHeapStart());
+        //        handle.Offset(n * mCbvSrvDescriptorSize);
+        // 或者用另一个等价实现，先指定要偏移到第几个描述符，再给出描述符的增量大小
+        handle.Offset(heapIndex, mCbvSrvUavDescriptorSize);
+
+        D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
+        cbvDesc.BufferLocation = cbAddress;
+        cbvDesc.SizeInBytes = passCBByteSize;
+
+        md3dDevice->CreateConstantBufferView(&cbvDesc, handle);
+    }
 }
 
 // 如果我们把着色器程序当作一个函数，而将输入资源看作着色器的函数参数，那么根签名
@@ -429,23 +490,33 @@ void ShapesApp::BuildRootSignature()
 
     // 我们将在第 7 章对 CD3DX12_ROOT_PARAMETER 和 CD3DX12_DESCRIPTOR_RANGE 这两种辅助结构进行更加细致的解读，
 
-    // 根参数可以是描述符表、根描述符或根常量
-    CD3DX12_ROOT_PARAMETER slotRootParameter[1];
+    // 我们的着色器程序需要获取两个描述符表，因为这两个 CBV（常量缓冲区视图）有着不同的更新频率
+    // ——渲染过程 CBV 仅需在每个渲染过程中设置一次，而物体 CBV 则要针对每一个渲染项进行配置
+
     // 创建一个只存有一个 CBV 的描述符表
-    CD3DX12_DESCRIPTOR_RANGE cbvTable;
-    cbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV,
-                  // 表中的描述符数量
-                  1,
-                  // 将这段描述符区域绑定至此基准着色器寄存器（base shader register）
-                  0);
-    slotRootParameter[0].InitAsDescriptorTable(1,          // 描述符区域的数量
-                                               &cbvTable); // 指向描述符区域数组的指针
+    CD3DX12_DESCRIPTOR_RANGE cbvTable0;
+    cbvTable0.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV,
+                   // 表中的描述符数量
+                   1,
+                   // 将这段描述符区域绑定至此基准着色器寄存器（base shader register）
+                   0);
+
+    CD3DX12_DESCRIPTOR_RANGE cbvTable1;
+    cbvTable1.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
+
+    // 根参数可以是描述符表、根描述符或根常量
+    CD3DX12_ROOT_PARAMETER slotRootParameter[2];
+
+    // 创建根 CBV
+    slotRootParameter[0].InitAsDescriptorTable(1,           // 描述符区域的数量
+                                               &cbvTable0); // 指向描述符区域数组的指针
+    slotRootParameter[1].InitAsDescriptorTable(1, &cbvTable1);
 
     // 上面这段代码创建了一个根参数，目的是将含有一个 CBV 的描述符表绑定到常量缓冲区寄存器 0，即 HLSL 代码中的
     // register(b0)。
 
     // 根签名由一组根参数构成
-    CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(1, slotRootParameter, 0, nullptr,
+    CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(2, slotRootParameter, 0, nullptr,
                                             D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
     // 创建仅含一个槽位（该槽位指向一个仅由单个常量缓冲区组成的描述符区域）的根签名
     ComPtr<ID3DBlob> serializedRootSig = nullptr;
@@ -472,12 +543,12 @@ void ShapesApp::BuildShadersAndInputLayout()
     HRESULT hr = S_OK;
 
     // 运行时编译 Shader
-    mvsByteCode = d3dUtil::CompileShader(L"Shaders\\color.hlsl", nullptr, "VS", "vs_5_0");
-    mpsByteCode = d3dUtil::CompileShader(L"Shaders\\color.hlsl", nullptr, "PS", "ps_5_0");
+    mShaders["standardVS"] = d3dUtil::CompileShader(L"Shaders\\color.hlsl", nullptr, "VS", "vs_5_1");
+    mShaders["opaquePS"] = d3dUtil::CompileShader(L"Shaders\\color.hlsl", nullptr, "PS", "ps_5_1");
 
     // 加载离线编译的 Shader 字节码，节省编译时间+提前发现编译错误
-    //    mvsByteCode = d3dUtil::LoadBinary(L"Shaders\\color_vs.cso");
-    //    mpsByteCode = d3dUtil::LoadBinary(L"Shaders\\color_ps.cso");
+    //    mShaders["standardVS"] = d3dUtil::LoadBinary(L"Shaders\\color_vs.cso");
+    //    mShaders["opaquePS"] = d3dUtil::LoadBinary(L"Shaders\\color_ps.cso");
 
     mInputLayout = {{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
                     {"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}};
@@ -485,120 +556,163 @@ void ShapesApp::BuildShadersAndInputLayout()
 
 void ShapesApp::BuildShapeGeometry()
 {
-    // clang-format off
-    std::array<Vertex, 8> vertices =
-        {
-            Vertex({ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::White) }),
-            Vertex({ XMFLOAT3(-1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Black) }),
-            Vertex({ XMFLOAT3(+1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Red) }),
-            Vertex({ XMFLOAT3(+1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::Green) }),
-            Vertex({ XMFLOAT3(-1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Blue) }),
-            Vertex({ XMFLOAT3(-1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Yellow) }),
-            Vertex({ XMFLOAT3(+1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Cyan) }),
-            Vertex({ XMFLOAT3(+1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Magenta) })
-        };
+    GeometryGenerator geoGen;
+    GeometryGenerator::MeshData box = geoGen.CreateBox(1.5f, 0.5f, 1.5f, 3);
+    GeometryGenerator::MeshData grid = geoGen.CreateGrid(20.0f, 30.0f, 60, 40);
+    GeometryGenerator::MeshData sphere = geoGen.CreateSphere(0.5f, 20, 20);
+    GeometryGenerator::MeshData cylinder = geoGen.CreateCylinder(0.5f, 0.3f, 3.0f, 20, 20);
+    //
+    // 将所有的几何体数据都合并到一对大的顶点/索引缓冲区中
+    // 以此来定义每个子网格数据在缓冲区中所占的范围
+    //
 
-    std::array<std::uint16_t, 36> indices =
+    // 对合并顶点缓冲区中每个物体的顶点偏移量进行缓存
+    UINT boxVertexOffset = 0;
+    UINT gridVertexOffset = (UINT)box.Vertices.size();
+    UINT sphereVertexOffset = gridVertexOffset + (UINT)grid.Vertices.size();
+    UINT cylinderVertexOffset = sphereVertexOffset + (UINT)sphere.Vertices.size();
+
+    // 对合并索引缓冲区中每个物体的起始索引进行缓存
+    UINT boxIndexOffset = 0;
+    UINT gridIndexOffset = (UINT)box.Indices32.size();
+    UINT sphereIndexOffset = gridIndexOffset + (UINT)grid.Indices32.size();
+    UINT cylinderIndexOffset = sphereIndexOffset + (UINT)sphere.Indices32.size();
+
+    // 定义的多个 SubmeshGeometry 结构体中包含了顶点/索引缓冲区内不同几何体的子网格数据
+
+    SubmeshGeometry boxSubmesh;
+    boxSubmesh.IndexCount = (UINT)box.Indices32.size();
+    boxSubmesh.StartIndexLocation = boxIndexOffset;
+    boxSubmesh.BaseVertexLocation = boxVertexOffset;
+
+    SubmeshGeometry gridSubmesh;
+    gridSubmesh.IndexCount = (UINT)grid.Indices32.size();
+    gridSubmesh.StartIndexLocation = gridIndexOffset;
+    gridSubmesh.BaseVertexLocation = gridVertexOffset;
+
+    SubmeshGeometry sphereSubmesh;
+    sphereSubmesh.IndexCount = (UINT)sphere.Indices32.size();
+    sphereSubmesh.StartIndexLocation = sphereIndexOffset;
+    sphereSubmesh.BaseVertexLocation = sphereVertexOffset;
+
+    SubmeshGeometry cylinderSubmesh;
+    cylinderSubmesh.IndexCount = (UINT)cylinder.Indices32.size();
+    cylinderSubmesh.StartIndexLocation = cylinderIndexOffset;
+    cylinderSubmesh.BaseVertexLocation = cylinderVertexOffset;
+
+    //
+    // 提取出所需的顶点元素，再将所有网格的顶点装进一个顶点缓冲区
+    //
+
+    auto totalVertexCount =
+        box.Vertices.size() + grid.Vertices.size() + sphere.Vertices.size() + cylinder.Vertices.size();
+
+    std::vector<Vertex> vertices(totalVertexCount);
+
+    UINT k = 0;
+    for (size_t i = 0; i < box.Vertices.size(); ++i, ++k)
     {
-        // 立方体前表面
-        0, 1, 2,
-        0, 2, 3,
+        vertices[k].Pos = box.Vertices[i].Position;
+        vertices[k].Color = XMFLOAT4(DirectX::Colors::DarkGreen);
+    }
 
-        // 立方体后表面
-        4, 6, 5,
-        4, 7, 6,
+    for (size_t i = 0; i < grid.Vertices.size(); ++i, ++k)
+    {
+        vertices[k].Pos = grid.Vertices[i].Position;
+        vertices[k].Color = XMFLOAT4(DirectX::Colors::ForestGreen);
+    }
 
-        // 立方体左表面
-        4, 5, 1,
-        4, 1, 0,
+    for (size_t i = 0; i < sphere.Vertices.size(); ++i, ++k)
+    {
+        vertices[k].Pos = sphere.Vertices[i].Position;
+        vertices[k].Color = XMFLOAT4(DirectX::Colors::Crimson);
+    }
 
-        // 立方体右表面
-        3, 2, 6,
-        3, 6, 7,
+    for (size_t i = 0; i < cylinder.Vertices.size(); ++i, ++k)
+    {
+        vertices[k].Pos = cylinder.Vertices[i].Position;
+        vertices[k].Color = XMFLOAT4(DirectX::Colors::SteelBlue);
+    }
 
-        // 立方体上表面
-        1, 5, 6,
-        1, 6, 2,
-
-        // 立方体下表面
-        4, 0, 3,
-        4, 3, 7
-    };
-    // clang-format on
+    std::vector<std::uint16_t> indices;
+    indices.insert(indices.end(), std::begin(box.GetIndices16()), std::end(box.GetIndices16()));
+    indices.insert(indices.end(), std::begin(grid.GetIndices16()), std::end(grid.GetIndices16()));
+    indices.insert(indices.end(), std::begin(sphere.GetIndices16()), std::end(sphere.GetIndices16()));
+    indices.insert(indices.end(), std::begin(cylinder.GetIndices16()), std::end(cylinder.GetIndices16()));
 
     const UINT vbByteSize = (UINT)vertices.size() * sizeof(Vertex);
     const UINT ibByteSize = (UINT)indices.size() * sizeof(std::uint16_t);
 
-    mBoxGeo = std::make_unique<MeshGeometry>();
-    mBoxGeo->Name = "boxGeo";
+    auto geo = std::make_unique<MeshGeometry>();
+    geo->Name = "shapeGeo";
 
-    ThrowIfFailed(D3DCreateBlob(vbByteSize, &mBoxGeo->VertexBufferCPU));
-    CopyMemory(mBoxGeo->VertexBufferCPU->GetBufferPointer(), vertices.data(), vbByteSize);
+    ThrowIfFailed(D3DCreateBlob(vbByteSize, &geo->VertexBufferCPU));
+    CopyMemory(geo->VertexBufferCPU->GetBufferPointer(), vertices.data(), vbByteSize);
 
-    ThrowIfFailed(D3DCreateBlob(ibByteSize, &mBoxGeo->IndexBufferCPU));
-    CopyMemory(mBoxGeo->IndexBufferCPU->GetBufferPointer(), indices.data(), ibByteSize);
+    ThrowIfFailed(D3DCreateBlob(ibByteSize, &geo->IndexBufferCPU));
+    CopyMemory(geo->IndexBufferCPU->GetBufferPointer(), indices.data(), ibByteSize);
 
-    // 我们无须为顶点缓冲区视图创建描述符堆。
-    mBoxGeo->VertexBufferGPU = d3dUtil::CreateDefaultBuffer(md3dDevice.Get(), mCommandList.Get(), vertices.data(),
-                                                            vbByteSize, mBoxGeo->VertexBufferUploader);
-    // 索引缓冲区
-    // 我们也无须为索引缓冲区视图创建描述符堆
-    // 由于 d3dUtil::CreateDefaultBuffer 函数是通过 void*类型作为参数引入泛型数据，这就意味着我们
-    // 也可以用此函数来创建索引缓冲区（或任意类型的默认缓冲区）。
-    mBoxGeo->IndexBufferGPU = d3dUtil::CreateDefaultBuffer(md3dDevice.Get(), mCommandList.Get(), indices.data(),
-                                                           ibByteSize, mBoxGeo->IndexBufferUploader);
-    mBoxGeo->VertexByteStride = sizeof(Vertex);
-    mBoxGeo->VertexBufferByteSize = vbByteSize;
-    mBoxGeo->IndexFormat = DXGI_FORMAT_R16_UINT;
-    mBoxGeo->IndexBufferByteSize = ibByteSize;
+    geo->VertexBufferGPU = d3dUtil::CreateDefaultBuffer(md3dDevice.Get(), mCommandList.Get(), vertices.data(),
+                                                        vbByteSize, geo->VertexBufferUploader);
 
-    SubmeshGeometry submesh;
-    submesh.IndexCount = (UINT)indices.size();
-    submesh.StartIndexLocation = 0;
-    submesh.BaseVertexLocation = 0;
-    mBoxGeo->DrawArgs["box"] = submesh;
+    geo->IndexBufferGPU = d3dUtil::CreateDefaultBuffer(md3dDevice.Get(), mCommandList.Get(), indices.data(), ibByteSize,
+                                                       geo->IndexBufferUploader);
+
+    geo->VertexByteStride = sizeof(Vertex);
+    geo->VertexBufferByteSize = vbByteSize;
+    geo->IndexFormat = DXGI_FORMAT_R16_UINT;
+    geo->IndexBufferByteSize = ibByteSize;
+
+    geo->DrawArgs["box"] = boxSubmesh;
+    geo->DrawArgs["grid"] = gridSubmesh;
+    geo->DrawArgs["sphere"] = sphereSubmesh;
+    geo->DrawArgs["cylinder"] = cylinderSubmesh;
+
+    mGeometries[geo->Name] = std::move(geo);
 }
 
 void ShapesApp::BuildPSOs()
 {
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
-    ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
+    D3D12_GRAPHICS_PIPELINE_STATE_DESC opaquePsoDesc;
+    ZeroMemory(&opaquePsoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
     // 输入布局描述，此结构体中有两个成员：一个由 D3D12_INPUT_ELEMENT_DESC
     // 元素构成的数组，以及一个表示此数组中元素数量的无符号整数。
-    psoDesc.InputLayout = {mInputLayout.data(), (UINT)mInputLayout.size()};
+    opaquePsoDesc.InputLayout = {mInputLayout.data(), (UINT)mInputLayout.size()};
     // 指向一个与此 PSO 相绑定的根签名的指针。该根签名一定要与此 PSO 指定的着色器相兼容。
-    psoDesc.pRootSignature = mRootSignature.Get();
+    opaquePsoDesc.pRootSignature = mRootSignature.Get();
     // 待绑定的顶点着色器。此成员由结构体 D3D12_SHADER_BYTECODE 表示，这个结构体存
     // 有指向已编译好的字节码数据的指针，以及该字节码数据所占的字节大小。
-    psoDesc.VS = {reinterpret_cast<BYTE *>(mvsByteCode->GetBufferPointer()), mvsByteCode->GetBufferSize()};
+    opaquePsoDesc.VS = {reinterpret_cast<BYTE *>(mShaders["standardVS"]->GetBufferPointer()),
+                        mShaders["standardVS"]->GetBufferSize()};
     // 待绑定的像素着色器
-    psoDesc.PS = {reinterpret_cast<BYTE *>(mpsByteCode->GetBufferPointer()), mpsByteCode->GetBufferSize()};
+    opaquePsoDesc.PS = {reinterpret_cast<BYTE *>(mShaders["opaquePS"]->GetBufferPointer()),
+                        mShaders["opaquePS"]->GetBufferSize()};
     // 指定用来配置光栅器的光栅化状态。
-    psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+    opaquePsoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
     // 指定混合（blending）操作所用的混合状态。我们将在后续章节中讨论此状态组，
     // 目前仅将此成员指定为默认的 CD3DX12_BLEND_DESC(D3D12_DEFAULT)。
-    psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+    opaquePsoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
     // 指定用于配置深度/模板测试的深度/模板状态。我们将在后续章节中对此状态进行讨论，
     // 目前只把它设为默认的 CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT)。
-    psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+    opaquePsoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
     // 多重采样最多可采集 32 个样本。借此参数的 32 位整数值，即可设置每个采样点的采集情况（采集或禁止采集）。
     // 例如，若禁用了第 5 位（将第 5 位设置为 0），则将不会对第 5 个样本进行采样。
     // 当然，要禁止采集第 5 个样本的前提是，所用的多重采样至少要有 5 个样本。
     // 假如一个应用程序仅使用了单采样（single sampling），那么只能针对该参数的第 1 位进行配置。
     // 一般来说，使用的都是默认值 0xffffffff，即表示对所有的采样点都进行采样。
-    psoDesc.SampleMask = UINT_MAX;
+    opaquePsoDesc.SampleMask = UINT_MAX;
     // 指定图元的拓扑类型
-    psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+    opaquePsoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
     // 同时所用的渲染目标数量（即 RTVFormats 数组中渲染目标格式的数量）
-    psoDesc.NumRenderTargets = 1;
+    opaquePsoDesc.NumRenderTargets = 1;
     // 渲染目标的格式。利用该数组实现向多渲染目标同时进行写操作。使用此 PSO
     // 的渲染目标的格式设定应当与此参数相匹配。
-    psoDesc.RTVFormats[0] = mBackBufferFormat;
+    opaquePsoDesc.RTVFormats[0] = mBackBufferFormat;
     // 深度/模板缓冲区的格式。使用此 PSO 的深度/模板缓冲区的格式设定应当与此参数相匹配。
-    psoDesc.DSVFormat = mDepthStencilFormat;
+    opaquePsoDesc.DSVFormat = mDepthStencilFormat;
     // 描述多重采样对每个像素采样的数量及其质量级别。此参数应与渲染目标的对应设置相匹配。
-    psoDesc.SampleDesc.Count = m4xMsaaState ? 4 : 1;
-    psoDesc.SampleDesc.Quality = m4xMsaaState ? (m4xMsaaQuality - 1) : 0;
+    opaquePsoDesc.SampleDesc.Count = m4xMsaaState ? 4 : 1;
+    opaquePsoDesc.SampleDesc.Quality = m4xMsaaState ? (m4xMsaaQuality - 1) : 0;
 
     // ID3D12PipelineState 对象集合了大量的流水线状态信息。为了保证性能，我们将所有这些对
     // 象都集总在一起，一并送至渲染流水线。通过这样的一个集合，Direct3D 便可以确定所有的状态是否彼
@@ -614,5 +728,206 @@ void ShapesApp::BuildPSOs()
     // 并非所有的渲染状态都封装于 PSO 内，如视口（viewport）和裁剪矩形（scissor rectangle）等
     // 属性就独立于 PSO。由于将这些状态的设置与其他的流水线状态分隔开来会更有效，所以把它们
     // 强行集中在 PSO 内也并不会为之增添任何优势。
-    ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPSO)));
+    ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&opaquePsoDesc, IID_PPV_ARGS(&mPSOs["opaque"])));
+
+    // 复制 opaquePsoDesc，修改为线框模式
+    D3D12_GRAPHICS_PIPELINE_STATE_DESC opaqueWireframePsoDesc = opaquePsoDesc;
+    opaqueWireframePsoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
+    ThrowIfFailed(
+        md3dDevice->CreateGraphicsPipelineState(&opaqueWireframePsoDesc, IID_PPV_ARGS(&mPSOs["opaque_wireframe"])));
+}
+
+void ShapesApp::BuildFrameResources()
+{
+    for (int i = 0; i < gNumFrameResources; ++i)
+    {
+        mFrameResources.push_back(std::make_unique<FrameResource>(md3dDevice.Get(), 1, (UINT)mAllRitems.size()));
+    }
+}
+
+// 更新物体常量缓冲区
+// 将物体世界坐标更新到当前 FrameResource 的常量缓冲里面。
+void ShapesApp::UpdateObjectCBs(const GameTimer &gt)
+{
+    auto currObjectCB = mCurrFrameResource->ObjectCB.get();
+    for (const auto &item : mAllRitems)
+    {
+        // 只要常量发生了改变就得更新常量缓冲区内的数据。而且要对每个帧资源都进行更新
+        if (item->NumFramesDirty > 0)
+        {
+            XMMATRIX world = XMLoadFloat4x4(&item->World);
+            ObjectConstants objectConstants;
+            XMStoreFloat4x4(&objectConstants.World, XMMatrixTranspose(world));
+            currObjectCB->CopyData(item->ObjCBIndex, objectConstants);
+            // 还需要对下一个 FrameResource 进行更新
+            item->NumFramesDirty--;
+        }
+    }
+}
+
+// 更新渲染过程常量缓冲区
+void ShapesApp::UpdateMainPassCB(const GameTimer &gt)
+{
+    XMMATRIX view = XMLoadFloat4x4(&mView);
+    XMMATRIX proj = XMLoadFloat4x4(&mProj);
+
+    XMMATRIX viewProj = XMMatrixMultiply(view, proj);
+    auto determinant = XMMatrixDeterminant(view);
+    XMMATRIX invView = XMMatrixInverse(&determinant, view);
+    determinant = XMMatrixDeterminant(proj);
+    XMMATRIX invProj = XMMatrixInverse(&determinant, proj);
+    determinant = XMMatrixDeterminant(viewProj);
+    XMMATRIX invViewProj = XMMatrixInverse(&determinant, viewProj);
+
+    XMStoreFloat4x4(&mMainPassCB.View, XMMatrixTranspose(view));
+    XMStoreFloat4x4(&mMainPassCB.InvView, XMMatrixTranspose(invView));
+    XMStoreFloat4x4(&mMainPassCB.Proj, XMMatrixTranspose(proj));
+    XMStoreFloat4x4(&mMainPassCB.InvProj, XMMatrixTranspose(invProj));
+    XMStoreFloat4x4(&mMainPassCB.ViewProj, XMMatrixTranspose(viewProj));
+    XMStoreFloat4x4(&mMainPassCB.InvViewProj, XMMatrixTranspose(invViewProj));
+    mMainPassCB.EyePosW = mEyePos;
+    mMainPassCB.RenderTargetSize = XMFLOAT2((float)mClientWidth, (float)mClientHeight);
+    mMainPassCB.InvRenderTargetSize = XMFLOAT2(1.0f / mClientWidth, 1.0f / mClientHeight);
+
+    mMainPassCB.NearZ = 1.0f;
+    mMainPassCB.FarZ = 1000.0f;
+    mMainPassCB.TotalTime = gt.TotalTime();
+    mMainPassCB.DeltaTime = gt.DeltaTime();
+    auto currPassCB = mCurrFrameResource->PassCB.get();
+    currPassCB->CopyData(0, mMainPassCB);
+}
+
+void ShapesApp::BuildRenderItems()
+{
+    auto boxRitem = std::make_unique<RenderItem>();
+    XMStoreFloat4x4(&boxRitem->World, XMMatrixScaling(2.0f, 2.0f, 2.0f) * XMMatrixTranslation(0.0f, 0.5f, 0.0f));
+    boxRitem->ObjCBIndex = 0;
+    boxRitem->Geo = mGeometries["shapeGeo"].get();
+    boxRitem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+    boxRitem->IndexCount = boxRitem->Geo->DrawArgs["box"].IndexCount;
+    boxRitem->StartIndexLocation = boxRitem->Geo->DrawArgs["box"].StartIndexLocation;
+    boxRitem->BaseVertexLocation = boxRitem->Geo->DrawArgs["box"].BaseVertexLocation;
+    mAllRitems.push_back(std::move(boxRitem));
+
+    auto gridRitem = std::make_unique<RenderItem>();
+    gridRitem->World = MathHelper::Identity4x4();
+    gridRitem->ObjCBIndex = 1;
+    gridRitem->Geo = mGeometries["shapeGeo"].get();
+    gridRitem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+    gridRitem->IndexCount = gridRitem->Geo->DrawArgs["grid"].IndexCount;
+    gridRitem->StartIndexLocation = gridRitem->Geo->DrawArgs["grid"].StartIndexLocation;
+    gridRitem->BaseVertexLocation = gridRitem->Geo->DrawArgs["grid"].BaseVertexLocation;
+    mAllRitems.push_back(std::move(gridRitem));
+
+    // 构建图 7.6 所示的柱体和球体
+    UINT objCBIndex = 2;
+    for (int i = 0; i < 5; ++i)
+    {
+        auto leftCylRitem = std::make_unique<RenderItem>();
+        auto rightCylRitem = std::make_unique<RenderItem>();
+        auto leftSphereRitem = std::make_unique<RenderItem>();
+        auto rightSphereRitem = std::make_unique<RenderItem>();
+
+        XMMATRIX leftCylWorld = XMMatrixTranslation(-5.0f, 1.5f, -10.0f + i * 5.0f);
+        XMMATRIX rightCylWorld = XMMatrixTranslation(+5.0f, 1.5f, -10.0f + i * 5.0f);
+
+        XMMATRIX leftSphereWorld = XMMatrixTranslation(-5.0f, 3.5f, -10.0f + i * 5.0f);
+        XMMATRIX rightSphereWorld = XMMatrixTranslation(+5.0f, 3.5f, -10.0f + i * 5.0f);
+
+        XMStoreFloat4x4(&leftCylRitem->World, rightCylWorld);
+        leftCylRitem->ObjCBIndex = objCBIndex++;
+        leftCylRitem->Geo = mGeometries["shapeGeo"].get();
+        leftCylRitem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+        leftCylRitem->IndexCount = leftCylRitem->Geo->DrawArgs["cylinder"].IndexCount;
+        leftCylRitem->StartIndexLocation = leftCylRitem->Geo->DrawArgs["cylinder"].StartIndexLocation;
+        leftCylRitem->BaseVertexLocation = leftCylRitem->Geo->DrawArgs["cylinder"].BaseVertexLocation;
+
+        XMStoreFloat4x4(&rightCylRitem->World, leftCylWorld);
+        rightCylRitem->ObjCBIndex = objCBIndex++;
+        rightCylRitem->Geo = mGeometries["shapeGeo"].get();
+        rightCylRitem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+        rightCylRitem->IndexCount = rightCylRitem->Geo->DrawArgs["cylinder"].IndexCount;
+        rightCylRitem->StartIndexLocation = rightCylRitem->Geo->DrawArgs["cylinder"].StartIndexLocation;
+        rightCylRitem->BaseVertexLocation = rightCylRitem->Geo->DrawArgs["cylinder"].BaseVertexLocation;
+
+        XMStoreFloat4x4(&leftSphereRitem->World, leftSphereWorld);
+        leftSphereRitem->ObjCBIndex = objCBIndex++;
+        leftSphereRitem->Geo = mGeometries["shapeGeo"].get();
+        leftSphereRitem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+        leftSphereRitem->IndexCount = leftSphereRitem->Geo->DrawArgs["sphere"].IndexCount;
+        leftSphereRitem->StartIndexLocation = leftSphereRitem->Geo->DrawArgs["sphere"].StartIndexLocation;
+        leftSphereRitem->BaseVertexLocation = leftSphereRitem->Geo->DrawArgs["sphere"].BaseVertexLocation;
+
+        XMStoreFloat4x4(&rightSphereRitem->World, rightSphereWorld);
+        rightSphereRitem->ObjCBIndex = objCBIndex++;
+        rightSphereRitem->Geo = mGeometries["shapeGeo"].get();
+        rightSphereRitem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+        rightSphereRitem->IndexCount = rightSphereRitem->Geo->DrawArgs["sphere"].IndexCount;
+        rightSphereRitem->StartIndexLocation = rightSphereRitem->Geo->DrawArgs["sphere"].StartIndexLocation;
+        rightSphereRitem->BaseVertexLocation = rightSphereRitem->Geo->DrawArgs["sphere"].BaseVertexLocation;
+
+        mAllRitems.push_back(std::move(leftCylRitem));
+        mAllRitems.push_back(std::move(rightCylRitem));
+        mAllRitems.push_back(std::move(leftSphereRitem));
+        mAllRitems.push_back(std::move(rightSphereRitem));
+    }
+    // 此演示程序中的所有渲染项都是非透明的
+    for (auto &e : mAllRitems)
+        mOpaqueRitems.push_back(e.get());
+}
+void ShapesApp::DrawRenderItems(ID3D12GraphicsCommandList *cmdList, const std::vector<RenderItem *> &ritems)
+{
+    UINT objCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
+    auto objectCB = mCurrFrameResource->ObjectCB->Resource();
+    // 对于每个渲染项来说...
+    for (size_t i = 0; i < ritems.size(); ++i)
+    {
+        auto ri = ritems[i];
+
+        auto vertexBufferView = ri->Geo->VertexBufferView();
+        cmdList->IASetVertexBuffers(0, 1, &vertexBufferView);
+        auto indexBufferView = ri->Geo->IndexBufferView();
+        cmdList->IASetIndexBuffer(&indexBufferView);
+        cmdList->IASetPrimitiveTopology(ri->PrimitiveType);
+
+        // 为了绘制当前的帧资源和当前物体，偏移到描述符堆中对应的 CBV 处
+        UINT cbvIndex = mCurrFrameResourceIndex * (UINT)mOpaqueRitems.size() + ri->ObjCBIndex;
+        auto cbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(mCbvHeap->GetGPUDescriptorHandleForHeapStart());
+        cbvHandle.Offset(cbvIndex, mCbvSrvUavDescriptorSize);
+
+        // 令描述符表与渲染流水线相绑定
+        cmdList->SetGraphicsRootDescriptorTable(0, cbvHandle);
+        cmdList->DrawIndexedInstanced(ri->IndexCount, 1, ri->StartIndexLocation, ri->BaseVertexLocation, 0);
+    }
+}
+
+void ShapesApp::OnKeyboardInput(const GameTimer &gt)
+{
+    if (GetAsyncKeyState('1') & 0x8000)
+        mIsWireframe = true;
+    else
+        mIsWireframe = false;
+}
+
+void ShapesApp::UpdateCamera(const GameTimer &gt)
+{
+    // https://zh.wikipedia.org/wiki/%E7%90%83%E5%BA%A7%E6%A8%99%E7%B3%BB
+    // 由于摄像机涉及环绕物体旋转等操作，所以先利用球坐标表示变换（可将摄像机视为针对目标物体的可控“侦查卫星”，
+    // 用鼠标调整摄像机与物体间的距离（也就是球面半径）以及观察角度），再将其转换为笛卡儿坐标的表示更为方便。
+    // 而这一摄像机系统也被称为旋转摄像机系统（orbiting camera system，也有作环绕摄像机系统）。
+    // 顺便提一句，除了上述两种坐标系之外，圆柱坐标系（cylindrical coordinate system，也有作柱面坐标系）
+    // 有时也会派上用场，因此掌握这 3 种坐标系间的转换对实际应用也会大有裨益。
+
+    // 由球坐标（也有译作球面坐标）转换为笛卡儿坐标
+    // 数学中通常使用的球坐标(r, θ, φ) ：径向距离 r，方位角 θ（theta）与极角 φ（phi）
+    float x = mRadius * sinf(mPhi) * cosf(mTheta);
+    float z = mRadius * sinf(mPhi) * sinf(mTheta);
+    float y = mRadius * cosf(mPhi);
+    // 构建观察矩阵
+    XMVECTOR pos = XMVectorSet(x, y, z, 1.0f);
+    XMVECTOR target = XMVectorZero();
+    XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+
+    XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
+    XMStoreFloat4x4(&mView, view);
 }

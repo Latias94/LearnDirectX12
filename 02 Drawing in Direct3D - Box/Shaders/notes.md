@@ -25,7 +25,7 @@ fxc "color.hlsl" /T vs_5_0 /E "VS" /Fo "color_vs.cso" /Fc "color_vs.asm"
 fxc "color.hlsl" /T ps_5_0 /E "PS" /Fo "color_ps.cso" /Fc "color_ps.asm" 
 ```
 
-注：`Developer Command Prompt for VS 2022` 有相关的环境变量，可以直接使用 fxc。
+注：`Developer Powershell for VS 2022` 有相关的环境变量，可以直接使用 fxc。
 
 | 参数             | 描述                                                |
 |----------------|---------------------------------------------------|

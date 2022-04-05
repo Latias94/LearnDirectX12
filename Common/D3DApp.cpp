@@ -125,6 +125,8 @@ bool D3DApp::InitDirect3D()
 
     // --------- 创建围栏并获取描述符的大小
     ThrowIfFailed(md3dDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&mFence)));
+    // 我们希望能够偏移到堆内的其他描述符处，为此需要了解到达堆内下一个相邻描述符的增量。这个增量的大小其实是由硬件来确定的，
+    // 所以我们必须从设备上查询相关的信息。此外，该增量还依赖于堆的具体类型。
     mRtvDescriptorSize = md3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
     mDsvDescriptorSize = md3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
     mCbvSrvUavDescriptorSize = md3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
