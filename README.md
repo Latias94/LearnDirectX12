@@ -15,5 +15,6 @@
 
 ## Reference
 
+* [《DirectX 12 3D 游戏开发实战》](https://book.douban.com/subject/30426701/)
 * [d3dcoder/d3d12book](https://github.com/d3dcoder/d3d12book)  
 * [DirectX11-With-Windows-SDK-Book](https://mkxjun.github.io/DirectX11-With-Windows-SDK-Book/)

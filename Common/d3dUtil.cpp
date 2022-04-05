@@ -5,6 +5,13 @@ bool d3dUtil::IsKeyDown(int vkeyCode)
     return (GetAsyncKeyState(vkeyCode) & 0x8000) != 0;
 }
 
+// 除了创建顶点缓冲区资源本身之外，我们还需用 D3D12_HEAP_TYPE_UPLOAD 这种堆类型来创建一个
+// 处于中介位置的上传缓冲区（upload buffer）资源。在 4.3.8 节里，我们就是通过把资源提交至上传堆，
+// 才得以将数据从 CPU 复制到 GPU 显存中。在创建了上传缓冲区之后，我们就可以将顶点数据
+// 从系统内存复制到上传缓冲区，而后再把顶点数据从上传缓冲区复制到真正的顶点缓冲区中。
+// 由于我们需要利用作为中介的上传缓冲区来初始化默认缓冲区（即用堆类型 D3D12_HEAP_TYPE_DEFAULT
+// 创建的缓冲区）中的数据，因此，我们就在 d3dUtil.h/.cpp 文件中构建了下列工具函数，以避
+// 免在每次使用默认缓冲区时再做这些重复的工作。
 ComPtr<ID3D12Resource> d3dUtil::CreateDefaultBuffer(ID3D12Device *device, ID3D12GraphicsCommandList *cmdList,
                                                     const void *initData, UINT64 byteSize,
                                                     ComPtr<ID3D12Resource> &uploadBuffer)
