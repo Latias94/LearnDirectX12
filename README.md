@@ -4,6 +4,7 @@
 
 * [01 DirectX12 Initialization](./01%20DirectX12%20Initialization)
 * [02 Drawing in Direct3D](./02%20Drawing%20in%20Direct3D)
+* [03 Drawing in Direct3D Part II - Shapes](./03%20Drawing%20in%20Direct3D%20Part%20II%20-%20Shapes)
 
 ## Build
 
