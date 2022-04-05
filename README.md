@@ -1,6 +1,6 @@
 # 跟着龙书学 DirectX 12
 
-## 章节
+## 示例
 
 * [01 DirectX12 Initialization](./01%20DirectX12%20Initialization)
 * [02 Drawing in Direct3D](./02%20Drawing%20in%20Direct3D)

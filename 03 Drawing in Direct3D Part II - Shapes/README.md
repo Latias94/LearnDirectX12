@@ -1,6 +1,6 @@
 # 利用 Direct3D 绘制几何体（续）
 
-[生成几何体](生成几何体.md)
+[生成几何体](../misc/notes/生成几何体.md)
 
 ![](../misc/images/03-result.png)
 ![](../misc/images/03-result-wireframe.png)
