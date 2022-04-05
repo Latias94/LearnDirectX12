@@ -40,12 +40,6 @@ struct RenderItem
     int BaseVertexLocation = 0;
 };
 
-struct Vertex
-{
-    XMFLOAT3 Pos;
-    XMFLOAT4 Color;
-};
-
 class ShapesApp : public D3DApp
 {
   public:

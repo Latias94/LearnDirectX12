@@ -28,6 +28,12 @@ struct PassConstants
     float DeltaTime = 0.0f;
 };
 
+struct Vertex
+{
+    DirectX::XMFLOAT3 Pos;
+    DirectX::XMFLOAT4 Color;
+};
+
 // 以 CPU 每帧都需更新的资源作为基本元素，创建一个环形数组（circular array，也有译作循环数组）。
 // 我们称这些资源为帧资源（frame resource），而这种循环数组通常是由 3 个帧资源元素所构成的。
 struct FrameResource

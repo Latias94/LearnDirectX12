@@ -25,7 +25,7 @@ class UploadBuffer
         {
             mElementByteSize = d3dUtil::CalcConstantBufferByteSize(mElementByteSize);
         }
-        // 由于常量缓冲区是用 D3D12_HEAP_TYPE_UPLOAD这种堆类型来创建的，所以我们就能通过 CPU 为常量缓冲区资源更新数据。
+        // 由于常量缓冲区是用 D3D12_HEAP_TYPE_UPLOAD 这种堆类型来创建的，所以我们就能通过 CPU 为常量缓冲区资源更新数据。
         auto heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
         auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(mElementByteSize * elementCount);
         ThrowIfFailed(device->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc,
@@ -47,6 +47,7 @@ class UploadBuffer
 
     UploadBuffer(const UploadBuffer &rhs) = delete;
     UploadBuffer &operator=(const UploadBuffer &rhs) = delete;
+
     ~UploadBuffer()
     {
         // 当常量缓冲区更新完成后，我们应在释放映射内存之前对其进行 Unmap（取消映射）操作

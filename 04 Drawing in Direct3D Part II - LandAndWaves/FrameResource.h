@@ -28,12 +28,19 @@ struct PassConstants
     float DeltaTime = 0.0f;
 };
 
+// 请不要与 GeometryGenerator::Vertex 结构体相混淆
+struct Vertex
+{
+    DirectX::XMFLOAT3 Pos;
+    DirectX::XMFLOAT4 Color;
+};
+
 // 以 CPU 每帧都需更新的资源作为基本元素，创建一个环形数组（circular array，也有译作循环数组）。
 // 我们称这些资源为帧资源（frame resource），而这种循环数组通常是由 3 个帧资源元素所构成的。
 struct FrameResource
 {
   public:
-    FrameResource(ID3D12Device *device, UINT passCount, UINT objectCount);
+    FrameResource(ID3D12Device* device, UINT passCount, UINT objectCount, UINT waveVertCount);
     FrameResource(const FrameResource &rhs) = delete;
     FrameResource &operator=(const FrameResource &rhs) = delete;
     ~FrameResource();
@@ -41,10 +48,15 @@ struct FrameResource
     // 在 GPU 处理完与此命令分配器相关的命令之前，我们不能对它进行重置。
     // 所以每一帧都要有它们自己的命令分配器
     ComPtr<ID3D12CommandAllocator> CmdListAlloc;
+
     // 在 GPU 执行完引用此常量缓冲区的命令之前，我们不能对它进行更新。
     // 因此每一帧都要有它们自己的常量缓冲区
     std::unique_ptr<UploadBuffer<PassConstants>> PassCB = nullptr;
     std::unique_ptr<UploadBuffer<ObjectConstants>> ObjectCB = nullptr;
+
+    // We cannot update a dynamic vertex buffer until the GPU is done processing
+    // the commands that reference it.  So each frame needs their own.
+    std::unique_ptr<UploadBuffer<Vertex>> WavesVB = nullptr;
 
     // 通过围栏值将命令标记到此围栏点，这使我们可以检测到 GPU 是否还在使用这些帧资源
     UINT64 Fence = 0;

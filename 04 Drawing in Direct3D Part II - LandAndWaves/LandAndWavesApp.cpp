@@ -1,6 +1,7 @@
 #include "D3DApp.h"
 #include "FrameResource.h"
 #include "GeometryGenerator.h"
+#include "Waves.h"
 
 using namespace DirectX;
 using namespace DirectX::PackedVector;
@@ -40,11 +41,10 @@ struct RenderItem
     int BaseVertexLocation = 0;
 };
 
-// 请不要与 GeometryGenerator::Vertex 结构体相混淆
-struct Vertex
+enum class RenderLayer : int
 {
-    XMFLOAT3 Pos;
-    XMFLOAT4 Color;
+    Opaque = 0,
+    Count
 };
 
 class LandAndWavesApp : public D3DApp
@@ -70,16 +70,19 @@ class LandAndWavesApp : public D3DApp
     void UpdateCamera(const GameTimer &gt);
     void UpdateObjectCBs(const GameTimer &gt);
     void UpdateMainPassCB(const GameTimer &gt);
+    void UpdateWaves(const GameTimer &gt);
 
-    void BuildDescriptorHeaps();
-    void BuildConstantBufferViews();
     void BuildRootSignature();
     void BuildShadersAndInputLayout();
     void BuildLandGeometry();
+    void BuildWavesGeometryBuffers();
     void BuildPSOs();
     void BuildFrameResources();
     void BuildRenderItems();
     void DrawRenderItems(ID3D12GraphicsCommandList *cmdList, const std::vector<RenderItem *> &ritems);
+
+    float GetHillsHeight(float x, float z) const;
+    XMFLOAT3 GetHillsNormal(float x, float z) const;
 
   private:
     // 实例化一个由 3 个帧资源元素所构成的向量，并留有特定的成员变量来记录当前的帧资源
@@ -88,9 +91,6 @@ class LandAndWavesApp : public D3DApp
     int mCurrFrameResourceIndex = 0;
 
     ComPtr<ID3D12RootSignature> mRootSignature = nullptr;
-    ComPtr<ID3D12DescriptorHeap> mCbvHeap = nullptr;
-
-    ComPtr<ID3D12DescriptorHeap> mSrvDescriptorHeap = nullptr;
 
     std::unordered_map<std::string, std::unique_ptr<MeshGeometry>> mGeometries;
     std::unordered_map<std::string, ComPtr<ID3DBlob>> mShaders;
@@ -98,16 +98,19 @@ class LandAndWavesApp : public D3DApp
 
     std::vector<D3D12_INPUT_ELEMENT_DESC> mInputLayout;
 
+    //  我们保存了一份波浪渲染项的引用（mWavesRitem），从而可以动态地调整其顶点缓冲区。由
+    // 于渲染项的顶点缓冲区是个动态的缓冲区，并且每一帧都在发生改变，因此这样做很有必要。
+    RenderItem *mWavesRitem = nullptr;
+
     // 存有所有渲染项的向量
     std::vector<std::unique_ptr<RenderItem>> mAllRitems;
 
-    // 根据 PSO 来划分渲染项
-    std::vector<RenderItem *> mOpaqueRitems;
-    //    std::vector<RenderItem*> mTransparentRitems;
+    // Render items divided by PSO.
+    std::vector<RenderItem *> mRitemLayer[(int)RenderLayer::Count];
+
+    std::unique_ptr<Waves> mWaves;
 
     PassConstants mMainPassCB;
-
-    UINT mPassCbvOffset = 0;
 
     bool mIsWireframe = false;
 
@@ -116,8 +119,11 @@ class LandAndWavesApp : public D3DApp
     XMFLOAT4X4 mProj = MathHelper::Identity4x4();
 
     float mTheta = 1.5f * XM_PI;
-    float mPhi = 0.2f * XM_PI;
-    float mRadius = 15.0f;
+    float mPhi = XM_PIDIV2 - 0.1f;
+    float mRadius = 50.0f;
+
+    float mSunTheta = 1.25f * XM_PI;
+    float mSunPhi = XM_PIDIV4;
 
     POINT mLastMousePos;
 };
@@ -162,13 +168,14 @@ bool LandAndWavesApp::Initialize()
     // 重置命令列表为执行初始化命令做好准备工作
     ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
 
+    mWaves = std::make_unique<Waves>(128, 128, 1.0f, 0.03f, 4.0f, 0.2f);
+
     BuildRootSignature();
     BuildShadersAndInputLayout();
     BuildLandGeometry();
+    BuildWavesGeometryBuffers();
     BuildRenderItems();
     BuildFrameResources();
-    BuildDescriptorHeaps();
-    BuildConstantBufferViews();
     BuildPSOs();
 
     // 执行初始化命令
@@ -213,6 +220,7 @@ void LandAndWavesApp::Update(const GameTimer &gt)
 
     UpdateObjectCBs(gt);
     UpdateMainPassCB(gt);
+    UpdateWaves(gt);
 }
 
 void LandAndWavesApp::Draw(const GameTimer &gt)
@@ -286,17 +294,22 @@ void LandAndWavesApp::Draw(const GameTimer &gt)
         // 指向一个 DSV 的指针，用于指定我们希望绑定到渲染流水线上的深度/模板缓冲区。
         &depthStencilView);
 
-    ID3D12DescriptorHeap *descriptorHeaps[] = {mCbvHeap.Get()};
-    mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
-
+    // 现在根签名不用描述符堆了，改用根常量，直接绑定 CBV 了。
+    //    ID3D12DescriptorHeap *descriptorHeaps[] = {mCbvHeap.Get()};
+    //    mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+    //    int passCbvIndex = mPassCbvOffset + mCurrFrameResourceIndex;
+    //    auto passCbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(mCbvHeap->GetGPUDescriptorHandleForHeapStart());
+    //    passCbvHandle.Offset(passCbvIndex, mCbvSrvUavDescriptorSize);
+    //
+    //    // 令描述符表与渲染流水线相绑定。
+    //    mCommandList->SetGraphicsRootDescriptorTable(1, passCbvHandle);
     mCommandList->SetGraphicsRootSignature(mRootSignature.Get());
 
-    int passCbvIndex = mPassCbvOffset + mCurrFrameResourceIndex;
-    auto passCbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(mCbvHeap->GetGPUDescriptorHandleForHeapStart());
-    passCbvHandle.Offset(passCbvIndex, mCbvSrvUavDescriptorSize);
-    // 令描述符表与渲染流水线相绑定。
-    mCommandList->SetGraphicsRootDescriptorTable(1, passCbvHandle);
-    DrawRenderItems(mCommandList.Get(), mOpaqueRitems);
+    // 绑定渲染过程中所用的常量缓冲区。在每个渲染过程中，这段代码只需执行一次
+    auto passCB = mCurrFrameResource->PassCB->Resource();
+    mCommandList->SetGraphicsRootConstantBufferView(1, passCB->GetGPUVirtualAddress());
+
+    DrawRenderItems(mCommandList.Get(), mRitemLayer[(int)RenderLayer::Opaque]);
 
     // 按照资源的用途指示其状态的转变，将资源从渲染目标状态转换回呈现状态
     resourceBarrier = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET,
@@ -351,119 +364,18 @@ void LandAndWavesApp::OnMouseMove(WPARAM btnState, int x, int y)
     else if ((btnState & MK_RBUTTON) != 0)
     {
         // 使场景中的每个像素按鼠标移动距离的 0.005 倍进行缩放
-        float dx = 0.005f * static_cast<float>(x - mLastMousePos.x);
-        float dy = 0.005f * static_cast<float>(y - mLastMousePos.y);
+        float dx = 0.2f * static_cast<float>(x - mLastMousePos.x);
+        float dy = 0.2f * static_cast<float>(y - mLastMousePos.y);
 
         // 根据鼠标的输入更新摄像机的可视范围半径
         mRadius += dx - dy;
 
         // 限制可视半径的范围
-        mRadius = MathHelper::Clamp(mRadius, 3.0f, 15.0f);
+        mRadius = MathHelper::Clamp(mRadius, 5.0f, 150.0f);
     }
 
     mLastMousePos.x = x;
     mLastMousePos.y = y;
-}
-
-// 利用描述符将常量缓冲区绑定至渲染流水线上
-// 如果有 3 个帧资源与 n 个渲染项，那么就应存在 3n 个物体常量缓冲区（object constant buffer）
-// 以及 3 个渲染过程常量缓冲区（pass constant buffer）。因此，我们也就需要创建 3(n+1) 个常量缓冲区视图（CBV）。
-// 这样一来，我们还要修改 CBV 堆以容纳额外的描述符：
-void LandAndWavesApp::BuildDescriptorHeaps()
-{
-    UINT objCount = (UINT)mOpaqueRitems.size();
-
-    // 我们需要为每个帧资源中的每一个物体都创建一个 CBV 描述符，obj CBV
-    // 为了容纳每个帧资源中的渲染过程 CBV 而 +1。pass CBV
-    UINT numDescriptors = (objCount + 1) * gNumFrameResources;
-
-    // 保存渲染过程 CBV 的起始偏移量。在本程序中，这是排在最后面的 3 个描述符
-    // n frame ObjCBVs | n+1 frame ObjCBVs | n+2 frame ObjCBVs | n frame passCBV | n+1 frame passCBV | n+2 frame passCBV
-    mPassCbvOffset = objCount * gNumFrameResources;
-
-    // 常量缓冲区描述符要存放在以 D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV 类型所建的描述符堆里。
-    // 这种堆内可以混合存储常量缓冲区描述符、着色器资源描述符和无序访问（unordered access）描述符。
-    D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc;
-    cbvHeapDesc.NumDescriptors = numDescriptors;
-    cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-    cbvHeapDesc.NodeMask = 0;
-
-    // 这段代码与我们之前创建渲染目标和深度/模板缓冲区这两种资源描述符堆的过程很相似。然而，其中却有着一个重要的区别，
-    // 那就是在创建供着色器程序访问资源的描述符时，我们要把标志 Flags 指定为 DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE。
-
-    ThrowIfFailed(md3dDevice->CreateDescriptorHeap(&cbvHeapDesc, IID_PPV_ARGS(&mCbvHeap)));
-}
-
-// 现在，我们就可以用下列代码来填充 CBV 堆，其中描述符 0 至描述符 n−1 包含了第 0 个帧资源的物体 CBV，
-// 描述符 n 至描述符 2n−1 容纳了第 1 个帧资源的物体 CBV，以此类推，描述符 2n 至描述符 3n−1 包含了
-// 第 2 个帧资源的物体 CBV。最后，3n、3n+1 以及 3n+2 分别存有第 0 个、第 1 个和第 2 个帧资源的渲染过程 CBV：
-void LandAndWavesApp::BuildConstantBufferViews()
-{
-    UINT objCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
-    UINT objCount = (UINT)mOpaqueRitems.size();
-    // 每个帧资源中的每一个物体都需要一个对应的 CBV 描述符
-    for (int frameIndex = 0; frameIndex < gNumFrameResources; ++frameIndex)
-    {
-        auto objectCB = mFrameResources[frameIndex]->ObjectCB->Resource();
-        for (UINT i = 0; i < objCount; ++i)
-        {
-            D3D12_GPU_VIRTUAL_ADDRESS cbAddress = objectCB->GetGPUVirtualAddress();
-
-            // 偏移到缓冲区中第 i 个物体的常量缓冲区
-            cbAddress += i * objCBByteSize;
-
-            // 偏移到该物体在描述符堆中的 CBV
-            int heapIndex = frameIndex * objCount + i;
-            auto handle = CD3DX12_CPU_DESCRIPTOR_HANDLE(mCbvHeap->GetCPUDescriptorHandleForHeapStart());
-            handle.Offset(heapIndex, mCbvSrvUavDescriptorSize);
-
-            // 如果常量缓冲区存储了一个内有 n 个物体常量数据的常量数组，那么我们就可以通过 BufferLocation 和
-            // SizeInBytes 参数来获取第 i 个物体的常量数据。考虑到硬件的需求（即硬件的最小分配空间），
-            // 成员 SizeInBytes 与 BufferLocation 必须为 256B 的整数倍。
-            // 若将上述两个成员的值都指定为 64，那么我们将看到调试错误
-            D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
-            cbvDesc.BufferLocation = cbAddress;
-            cbvDesc.SizeInBytes = objCBByteSize;
-
-            md3dDevice->CreateConstantBufferView(&cbvDesc, handle);
-        }
-    }
-
-    UINT passCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(PassConstants));
-
-    // 最后 3 个描述符依次是每个帧资源的渲染过程 CBV
-    // n frame ObjCBVs | n+1 frame ObjCBVs | n+2 frame ObjCBVs | n frame passCBV | n+1 frame passCBV | n+2 frame passCBV
-    for (int frameIndex = 0; frameIndex < gNumFrameResources; ++frameIndex)
-    {
-        auto passCB = mFrameResources[frameIndex]->PassCB->Resource();
-
-        // 每个帧资源的渲染过程缓冲区中只存有一个常量缓冲区
-        D3D12_GPU_VIRTUAL_ADDRESS cbAddress = passCB->GetGPUVirtualAddress();
-
-        // 偏移到描述符堆中对应的渲染过程 CBV
-        int heapIndex = mPassCbvOffset + frameIndex;
-
-        // 通过调用 ID3D12DescriptorHeap::GetCPUDescriptorHandleForHeapStart 方法，
-        // 我们可以获得堆中第一个描述符的句柄。然而，我们当前堆内所存放的描述符已不止一个，
-        // 所以仅使用此方法并不能找到其他描述符的句柄。此时，我们希望能够偏移到堆内的其他描述符处，
-        // 为此需要了解到达堆内下一个相邻描述符的增量。这个增量的大小其实是由硬件来确定的，
-        // 所以我们必须从设备上查询相关的信息。此外，该增量还依赖于堆的具体类型。这里增量为： mCbvSrvUavDescriptorSize
-        // 只要知道了相邻描述符之间的增量大小，就能通过两种 CD3DX12_CPU_DESCRIPTOR_HANDLE::Offset 方法之一偏
-        // 移到第 n 个描述符的句柄处：
-
-        // 指定要偏移到的目标描述符的编号，将它与相邻描述符之间的增量相乘，以此来找到第 n 个描述符的句柄
-        auto handle = CD3DX12_CPU_DESCRIPTOR_HANDLE(mCbvHeap->GetCPUDescriptorHandleForHeapStart());
-        //        handle.Offset(n * mCbvSrvDescriptorSize);
-        // 或者用另一个等价实现，先指定要偏移到第几个描述符，再给出描述符的增量大小
-        handle.Offset(heapIndex, mCbvSrvUavDescriptorSize);
-
-        D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
-        cbvDesc.BufferLocation = cbAddress;
-        cbvDesc.SizeInBytes = passCBByteSize;
-
-        md3dDevice->CreateConstantBufferView(&cbvDesc, handle);
-    }
 }
 
 // 如果我们把着色器程序当作一个函数，而将输入资源看作着色器的函数参数，那么根签名
@@ -494,27 +406,20 @@ void LandAndWavesApp::BuildRootSignature()
     // 我们的着色器程序需要获取两个描述符表，因为这两个 CBV（常量缓冲区视图）有着不同的更新频率
     // ——渲染过程 CBV 仅需在每个渲染过程中设置一次，而物体 CBV 则要针对每一个渲染项进行配置
 
-    // 创建一个只存有一个 CBV 的描述符表
-    CD3DX12_DESCRIPTOR_RANGE cbvTable0;
-    cbvTable0.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV,
-                   // 表中的描述符数量
-                   1,
-                   // 将这段描述符区域绑定至此基准着色器寄存器（base shader register）
-                   0);
-
-    CD3DX12_DESCRIPTOR_RANGE cbvTable1;
-    cbvTable1.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
+    // 此 “Land and Waves” 演示程序较之前 “Shape” 例程的另一个区别是：我们在前者中使用了根描述符，
+    // 因此就可以摆脱描述符堆而直接绑定 CBV 了。为此，程序还要做如下改动：
+    //
+    // 1. 根签名需要变为取两个根 CBV，而不再是两个描述符表。
+    // 2. 不采用 CBV 堆，更无需向其填充描述符。
+    // 3. 涉及一种用于绑定根描述符的新语法。
 
     // 根参数可以是描述符表、根描述符或根常量
     CD3DX12_ROOT_PARAMETER slotRootParameter[2];
 
     // 创建根 CBV
-    slotRootParameter[0].InitAsDescriptorTable(1,           // 描述符区域的数量
-                                               &cbvTable0); // 指向描述符区域数组的指针
-    slotRootParameter[1].InitAsDescriptorTable(1, &cbvTable1);
-
-    // 上面这段代码创建了一个根参数，目的是将含有一个 CBV 的描述符表绑定到常量缓冲区寄存器 0，即 HLSL 代码中的
-    // register(b0)。
+    // 指定的着色器常量缓冲区寄存器分别为 “b0” 和 “b1”
+    slotRootParameter[0].InitAsConstantBufferView(0); // 物体的 CBV
+    slotRootParameter[1].InitAsConstantBufferView(1); // 渲染过程 CBV
 
     // 根签名由一组根参数构成
     CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(2, slotRootParameter, 0, nullptr,
@@ -557,7 +462,139 @@ void LandAndWavesApp::BuildShadersAndInputLayout()
 
 void LandAndWavesApp::BuildLandGeometry()
 {
+    GeometryGenerator geoGen;
+    GeometryGenerator::MeshData grid = geoGen.CreateGrid(160.0f, 160.0f, 50, 50);
 
+    //
+    // 获取我们所需要的顶点元素，并利用高度函数计算每个顶点的高度值
+    // 另外，顶点的颜色要基于它们的高度而定
+    // 所以，图像中才会有看起来如沙质的沙滩、山腰处的植被以及山峰处的积雪
+    //
+
+    std::vector<Vertex> vertices(grid.Vertices.size());
+    for (size_t i = 0; i < grid.Vertices.size(); ++i)
+    {
+        auto &p = grid.Vertices[i].Position;
+        vertices[i].Pos = p;
+        vertices[i].Pos.y = GetHillsHeight(p.x, p.z);
+
+        // 基于顶点高度为它上色
+        if (vertices[i].Pos.y < -10.0f)
+        {
+            // 沙滩的颜色
+            vertices[i].Color = XMFLOAT4(1.0f, 0.96f, 0.62f, 1.0f);
+        }
+        else if (vertices[i].Pos.y < 5.0f)
+        {
+            // 浅黄绿色
+            vertices[i].Color = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
+        }
+        else if (vertices[i].Pos.y < 12.0f)
+        {
+            // 深黄绿色
+            vertices[i].Color = XMFLOAT4(0.1f, 0.48f, 0.19f, 1.0f);
+        }
+        else if (vertices[i].Pos.y < 20.0f)
+        {
+            // 深棕色
+            vertices[i].Color = XMFLOAT4(0.45f, 0.39f, 0.34f, 1.0f);
+        }
+        else
+        {
+            // 白雪皑皑
+            vertices[i].Color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+        }
+    }
+
+    const UINT vbByteSize = (UINT)vertices.size() * sizeof(Vertex);
+
+    std::vector<std::uint16_t> indices = grid.GetIndices16();
+    const UINT ibByteSize = (UINT)indices.size() * sizeof(std::uint16_t);
+
+    auto geo = std::make_unique<MeshGeometry>();
+    geo->Name = "landGeo";
+
+    ThrowIfFailed(D3DCreateBlob(vbByteSize, &geo->VertexBufferCPU));
+    CopyMemory(geo->VertexBufferCPU->GetBufferPointer(), vertices.data(), vbByteSize);
+
+    ThrowIfFailed(D3DCreateBlob(ibByteSize, &geo->IndexBufferCPU));
+    CopyMemory(geo->IndexBufferCPU->GetBufferPointer(), indices.data(), ibByteSize);
+
+    geo->VertexBufferGPU = d3dUtil::CreateDefaultBuffer(md3dDevice.Get(), mCommandList.Get(), vertices.data(),
+                                                        vbByteSize, geo->VertexBufferUploader);
+
+    geo->IndexBufferGPU = d3dUtil::CreateDefaultBuffer(md3dDevice.Get(), mCommandList.Get(), indices.data(), ibByteSize,
+                                                       geo->IndexBufferUploader);
+
+    geo->VertexByteStride = sizeof(Vertex);
+    geo->VertexBufferByteSize = vbByteSize;
+    geo->IndexFormat = DXGI_FORMAT_R16_UINT;
+    geo->IndexBufferByteSize = ibByteSize;
+
+    SubmeshGeometry submesh;
+    submesh.IndexCount = (UINT)indices.size();
+    submesh.StartIndexLocation = 0;
+    submesh.BaseVertexLocation = 0;
+
+    geo->DrawArgs["grid"] = submesh;
+
+    mGeometries["landGeo"] = std::move(geo);
+}
+
+void LandAndWavesApp::BuildWavesGeometryBuffers()
+{
+    std::vector<std::uint16_t> indices(3 * mWaves->TriangleCount()); // 3 indices per face
+    assert(mWaves->VertexCount() < 0x0000ffff);
+
+    // Iterate over each quad.
+    int m = mWaves->RowCount();
+    int n = mWaves->ColumnCount();
+    int k = 0;
+    for (int i = 0; i < m - 1; ++i)
+    {
+        for (int j = 0; j < n - 1; ++j)
+        {
+            indices[k] = i * n + j;
+            indices[k + 1] = i * n + j + 1;
+            indices[k + 2] = (i + 1) * n + j;
+
+            indices[k + 3] = (i + 1) * n + j;
+            indices[k + 4] = i * n + j + 1;
+            indices[k + 5] = (i + 1) * n + j + 1;
+
+            k += 6; // next quad
+        }
+    }
+
+    UINT vbByteSize = mWaves->VertexCount() * sizeof(Vertex);
+    UINT ibByteSize = (UINT)indices.size() * sizeof(std::uint16_t);
+
+    auto geo = std::make_unique<MeshGeometry>();
+    geo->Name = "waterGeo";
+
+    // Set dynamically.
+    geo->VertexBufferCPU = nullptr;
+    geo->VertexBufferGPU = nullptr;
+
+    ThrowIfFailed(D3DCreateBlob(ibByteSize, &geo->IndexBufferCPU));
+    CopyMemory(geo->IndexBufferCPU->GetBufferPointer(), indices.data(), ibByteSize);
+
+    geo->IndexBufferGPU = d3dUtil::CreateDefaultBuffer(md3dDevice.Get(), mCommandList.Get(), indices.data(), ibByteSize,
+                                                       geo->IndexBufferUploader);
+
+    geo->VertexByteStride = sizeof(Vertex);
+    geo->VertexBufferByteSize = vbByteSize;
+    geo->IndexFormat = DXGI_FORMAT_R16_UINT;
+    geo->IndexBufferByteSize = ibByteSize;
+
+    SubmeshGeometry submesh;
+    submesh.IndexCount = (UINT)indices.size();
+    submesh.StartIndexLocation = 0;
+    submesh.BaseVertexLocation = 0;
+
+    geo->DrawArgs["grid"] = submesh;
+
+    mGeometries["waterGeo"] = std::move(geo);
 }
 
 void LandAndWavesApp::BuildPSOs()
@@ -630,7 +667,8 @@ void LandAndWavesApp::BuildFrameResources()
 {
     for (int i = 0; i < gNumFrameResources; ++i)
     {
-        mFrameResources.push_back(std::make_unique<FrameResource>(md3dDevice.Get(), 1, (UINT)mAllRitems.size()));
+        mFrameResources.push_back(
+            std::make_unique<FrameResource>(md3dDevice.Get(), 1, (UINT)mAllRitems.size(), mWaves->VertexCount()));
     }
 }
 
@@ -688,82 +726,34 @@ void LandAndWavesApp::UpdateMainPassCB(const GameTimer &gt)
 
 void LandAndWavesApp::BuildRenderItems()
 {
-    auto boxRitem = std::make_unique<RenderItem>();
-    XMStoreFloat4x4(&boxRitem->World, XMMatrixScaling(2.0f, 2.0f, 2.0f) * XMMatrixTranslation(0.0f, 0.5f, 0.0f));
-    boxRitem->ObjCBIndex = 0;
-    boxRitem->Geo = mGeometries["shapeGeo"].get();
-    boxRitem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-    boxRitem->IndexCount = boxRitem->Geo->DrawArgs["box"].IndexCount;
-    boxRitem->StartIndexLocation = boxRitem->Geo->DrawArgs["box"].StartIndexLocation;
-    boxRitem->BaseVertexLocation = boxRitem->Geo->DrawArgs["box"].BaseVertexLocation;
-    mAllRitems.push_back(std::move(boxRitem));
+    auto wavesRitem = std::make_unique<RenderItem>();
+    wavesRitem->World = MathHelper::Identity4x4();
+    wavesRitem->ObjCBIndex = 0;
+    wavesRitem->Geo = mGeometries["waterGeo"].get();
+    wavesRitem->PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+    wavesRitem->IndexCount = wavesRitem->Geo->DrawArgs["grid"].IndexCount;
+    wavesRitem->StartIndexLocation = wavesRitem->Geo->DrawArgs["grid"].StartIndexLocation;
+    wavesRitem->BaseVertexLocation = wavesRitem->Geo->DrawArgs["grid"].BaseVertexLocation;
+
+    mWavesRitem = wavesRitem.get();
+
+    mRitemLayer[(int)RenderLayer::Opaque].push_back(wavesRitem.get());
 
     auto gridRitem = std::make_unique<RenderItem>();
     gridRitem->World = MathHelper::Identity4x4();
     gridRitem->ObjCBIndex = 1;
-    gridRitem->Geo = mGeometries["shapeGeo"].get();
-    gridRitem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+    gridRitem->Geo = mGeometries["landGeo"].get();
+    gridRitem->PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
     gridRitem->IndexCount = gridRitem->Geo->DrawArgs["grid"].IndexCount;
     gridRitem->StartIndexLocation = gridRitem->Geo->DrawArgs["grid"].StartIndexLocation;
     gridRitem->BaseVertexLocation = gridRitem->Geo->DrawArgs["grid"].BaseVertexLocation;
+
+    mRitemLayer[(int)RenderLayer::Opaque].push_back(gridRitem.get());
+
+    mAllRitems.push_back(std::move(wavesRitem));
     mAllRitems.push_back(std::move(gridRitem));
-
-    // 构建图 7.6 所示的柱体和球体
-    UINT objCBIndex = 2;
-    for (int i = 0; i < 5; ++i)
-    {
-        auto leftCylRitem = std::make_unique<RenderItem>();
-        auto rightCylRitem = std::make_unique<RenderItem>();
-        auto leftSphereRitem = std::make_unique<RenderItem>();
-        auto rightSphereRitem = std::make_unique<RenderItem>();
-
-        XMMATRIX leftCylWorld = XMMatrixTranslation(-5.0f, 1.5f, -10.0f + i * 5.0f);
-        XMMATRIX rightCylWorld = XMMatrixTranslation(+5.0f, 1.5f, -10.0f + i * 5.0f);
-
-        XMMATRIX leftSphereWorld = XMMatrixTranslation(-5.0f, 3.5f, -10.0f + i * 5.0f);
-        XMMATRIX rightSphereWorld = XMMatrixTranslation(+5.0f, 3.5f, -10.0f + i * 5.0f);
-
-        XMStoreFloat4x4(&leftCylRitem->World, rightCylWorld);
-        leftCylRitem->ObjCBIndex = objCBIndex++;
-        leftCylRitem->Geo = mGeometries["shapeGeo"].get();
-        leftCylRitem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-        leftCylRitem->IndexCount = leftCylRitem->Geo->DrawArgs["cylinder"].IndexCount;
-        leftCylRitem->StartIndexLocation = leftCylRitem->Geo->DrawArgs["cylinder"].StartIndexLocation;
-        leftCylRitem->BaseVertexLocation = leftCylRitem->Geo->DrawArgs["cylinder"].BaseVertexLocation;
-
-        XMStoreFloat4x4(&rightCylRitem->World, leftCylWorld);
-        rightCylRitem->ObjCBIndex = objCBIndex++;
-        rightCylRitem->Geo = mGeometries["shapeGeo"].get();
-        rightCylRitem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-        rightCylRitem->IndexCount = rightCylRitem->Geo->DrawArgs["cylinder"].IndexCount;
-        rightCylRitem->StartIndexLocation = rightCylRitem->Geo->DrawArgs["cylinder"].StartIndexLocation;
-        rightCylRitem->BaseVertexLocation = rightCylRitem->Geo->DrawArgs["cylinder"].BaseVertexLocation;
-
-        XMStoreFloat4x4(&leftSphereRitem->World, leftSphereWorld);
-        leftSphereRitem->ObjCBIndex = objCBIndex++;
-        leftSphereRitem->Geo = mGeometries["shapeGeo"].get();
-        leftSphereRitem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-        leftSphereRitem->IndexCount = leftSphereRitem->Geo->DrawArgs["sphere"].IndexCount;
-        leftSphereRitem->StartIndexLocation = leftSphereRitem->Geo->DrawArgs["sphere"].StartIndexLocation;
-        leftSphereRitem->BaseVertexLocation = leftSphereRitem->Geo->DrawArgs["sphere"].BaseVertexLocation;
-
-        XMStoreFloat4x4(&rightSphereRitem->World, rightSphereWorld);
-        rightSphereRitem->ObjCBIndex = objCBIndex++;
-        rightSphereRitem->Geo = mGeometries["shapeGeo"].get();
-        rightSphereRitem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-        rightSphereRitem->IndexCount = rightSphereRitem->Geo->DrawArgs["sphere"].IndexCount;
-        rightSphereRitem->StartIndexLocation = rightSphereRitem->Geo->DrawArgs["sphere"].StartIndexLocation;
-        rightSphereRitem->BaseVertexLocation = rightSphereRitem->Geo->DrawArgs["sphere"].BaseVertexLocation;
-
-        mAllRitems.push_back(std::move(leftCylRitem));
-        mAllRitems.push_back(std::move(rightCylRitem));
-        mAllRitems.push_back(std::move(leftSphereRitem));
-        mAllRitems.push_back(std::move(rightSphereRitem));
-    }
-    // 此演示程序中的所有渲染项都是非透明的
-    for (auto &e : mAllRitems)
-        mOpaqueRitems.push_back(e.get());
 }
+
 void LandAndWavesApp::DrawRenderItems(ID3D12GraphicsCommandList *cmdList, const std::vector<RenderItem *> &ritems)
 {
     UINT objCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
@@ -779,13 +769,15 @@ void LandAndWavesApp::DrawRenderItems(ID3D12GraphicsCommandList *cmdList, const 
         cmdList->IASetIndexBuffer(&indexBufferView);
         cmdList->IASetPrimitiveTopology(ri->PrimitiveType);
 
-        // 为了绘制当前的帧资源和当前物体，偏移到描述符堆中对应的 CBV 处
-        UINT cbvIndex = mCurrFrameResourceIndex * (UINT)mOpaqueRitems.size() + ri->ObjCBIndex;
-        auto cbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(mCbvHeap->GetGPUDescriptorHandleForHeapStart());
-        cbvHandle.Offset(cbvIndex, mCbvSrvUavDescriptorSize);
+        D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = objectCB->GetGPUVirtualAddress();
+        objCBAddress += ri->ObjCBIndex * objCBByteSize;
 
-        // 令描述符表与渲染流水线相绑定
-        cmdList->SetGraphicsRootDescriptorTable(0, cbvHandle);
+        // 以传递参数的方式将 CBV 与某个根描述符相绑定
+        cmdList->SetGraphicsRootConstantBufferView(
+            // RootParameterIndex：CBV 将要绑定到的根参数索引，即寄存器的槽位号。
+            0,
+            // BufferLocation：含有常量缓冲区数据资源的虚拟地址。
+            objCBAddress);
         cmdList->DrawIndexedInstanced(ri->IndexCount, 1, ri->StartIndexLocation, ri->BaseVertexLocation, 0);
     }
 }
@@ -819,4 +811,57 @@ void LandAndWavesApp::UpdateCamera(const GameTimer &gt)
 
     XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
     XMStoreFloat4x4(&mView, view);
+}
+
+float LandAndWavesApp::GetHillsHeight(float x, float z) const
+{
+    return 0.3f * (z * sinf(0.1f * x) + x * cosf(0.1f * z));
+}
+
+XMFLOAT3 LandAndWavesApp::GetHillsNormal(float x, float z) const
+{
+    // n = (-df/dx, 1, -df/dz)
+    XMFLOAT3 n(-0.03f * z * cosf(0.1f * x) - 0.3f * cosf(0.1f * z), 1.0f,
+               -0.3f * sinf(0.1f * x) + 0.03f * x * sinf(0.1f * z));
+
+    XMVECTOR unitNormal = XMVector3Normalize(XMLoadFloat3(&n));
+    XMStoreFloat3(&n, unitNormal);
+
+    return n;
+}
+
+// 模拟波浪并更新顶点缓冲区
+void LandAndWavesApp::UpdateWaves(const GameTimer &gt)
+{
+    // 每隔 1/4 秒就要生成一个随机波浪
+    static float t_base = 0.0f;
+    if ((mTimer.TotalTime() - t_base) >= 0.25f)
+    {
+        t_base += 0.25f;
+
+        int i = MathHelper::Rand(4, mWaves->RowCount() - 5);
+        int j = MathHelper::Rand(4, mWaves->ColumnCount() - 5);
+
+        float r = MathHelper::RandF(0.2f, 0.5f);
+
+        mWaves->Disturb(i, j, r);
+    }
+
+    // 更新模拟的波浪
+    mWaves->Update(gt.DeltaTime());
+
+    // 用波浪方程求出的新数据来更新波浪顶点缓冲区
+    auto currWavesVB = mCurrFrameResource->WavesVB.get();
+    for (int i = 0; i < mWaves->VertexCount(); ++i)
+    {
+        Vertex v;
+
+        v.Pos = mWaves->Position(i);
+        v.Color = XMFLOAT4(DirectX::Colors::Blue);
+
+        currWavesVB->CopyData(i, v);
+    }
+
+    // 将波浪渲染项的动态顶点缓冲区设置到当前帧的顶点缓冲区
+    mWavesRitem->Geo->VertexBufferGPU = currWavesVB->Resource();
 }
