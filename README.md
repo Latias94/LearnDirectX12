@@ -1,5 +1,9 @@
 # 跟着龙书学 DirectX 12
 
+```shell
+git clone --recurse-submodules -j8 https://github.com/Latias94/LearnDirectX12
+```
+
 ## 示例
 
 * [01 DirectX12 Initialization](./01%20DirectX12%20Initialization)
