@@ -6,6 +6,7 @@ x64/
 .idea/
 build/
 cmake-build*
+.cache/
 
 *.vcxproj.user
 #*.cso

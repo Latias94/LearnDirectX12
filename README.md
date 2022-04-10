@@ -19,6 +19,7 @@ git clone --recurse-submodules -j8 https://github.com/Latias94/LearnDirectX12
 * install [XMake](https://xmake.io/) and Clang
   * `cd '.\01 DirectX12 Initialization\'` `xmake && xmake run`
   * ref: [Windows渲染引擎开发入门教学（4.5）: 更舒适的编译流程](https://zhuanlan.zhihu.com/p/495864590)
+  * vscode 安装 Clangd 插件，`cd '.\01 DirectX12 Initialization\'` `code .`
 
 ## Reference
 

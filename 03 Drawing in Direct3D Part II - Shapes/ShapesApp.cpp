@@ -752,6 +752,7 @@ void ShapesApp::UpdateObjectCBs(const GameTimer &gt)
             XMMATRIX world = XMLoadFloat4x4(&item->World);
             ObjectConstants objectConstants;
             XMStoreFloat4x4(&objectConstants.World, XMMatrixTranspose(world));
+            // 这里只更新了当前 FrameResource 的物体常量缓冲
             currObjectCB->CopyData(item->ObjCBIndex, objectConstants);
             // 还需要对下一个 FrameResource 进行更新
             item->NumFramesDirty--;
