@@ -229,7 +229,7 @@ void D3DApp::FlushCommandQueue()
     // 在 CPU 端等待 GPU，直到后者执行完这个围栏点之前的所有命令
     if (mFence->GetCompletedValue() < mCurrentFence)
     {
-        HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
+        HANDLE eventHandle = CreateEventEx(nullptr, nullptr, false, EVENT_ALL_ACCESS);
 
         // 若 GPU 命中当前的围栏（即执行到 Signal()指令，修改了围栏值），则激发预定事件
         ThrowIfFailed(mFence->SetEventOnCompletion(mCurrentFence, eventHandle));
