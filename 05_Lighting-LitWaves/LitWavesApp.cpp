@@ -71,6 +71,7 @@ class LitWavesApp : public D3DApp
     void OnKeyboardInput(const GameTimer &gt);
     void UpdateCamera(const GameTimer &gt);
     void UpdateObjectCBs(const GameTimer &gt);
+    void UpdateMaterialCBs(const GameTimer& gt);
     void UpdateMainPassCB(const GameTimer &gt);
     void UpdateWaves(const GameTimer &gt);
 
@@ -698,6 +699,12 @@ void LitWavesApp::UpdateObjectCBs(const GameTimer &gt)
     }
 }
 
+// 在更新函数中，当材质数据有了变化（即存在所谓的“脏数据”）时，便会将其复制到常量缓冲区的
+// 对应子区域内，因此 GPU 材质常量缓冲区中的数据总是与系统内存中的最新材质数据保持一致
+void UpdateMaterialCBs(const GameTimer& gt){
+
+}
+
 // 更新渲染过程常量缓冲区
 void LitWavesApp::UpdateMainPassCB(const GameTimer &gt)
 {
@@ -874,4 +881,22 @@ void LitWavesApp::UpdateWaves(const GameTimer &gt)
 
 void LitWavesApp::BuildMaterials()
 {
+    auto grass = std::make_unique<Material>();
+    grass->Name = "grass";
+    grass->MatCBIndex = 0;
+    grass->DiffuseAlbedo = XMFLOAT4(0.2f, 0.6f, 0.2f, 1.0f);
+    grass->FresnelR0 = XMFLOAT3(0.01f, 0.01f, 0.01f);
+    grass->Roughness = 0.125f;
+
+    // 当前这种水的材质定义得并不是很好，但是由于我们还未学会所需的全部渲染工具（如透明度、环境反
+    // 射等），因此暂时先用这些数据解当务之急吧
+    auto water = std::make_unique<Material>();
+    water->Name = "water";
+    water->MatCBIndex = 1;
+    water->DiffuseAlbedo = XMFLOAT4(0.0f, 0.2f, 0.6f, 1.0f);
+    water->FresnelR0 = XMFLOAT3(0.1f, 0.1f, 0.1f);
+    water->Roughness = 0.0f;
+
+    mMaterials["grass"] = std::move(grass);
+    mMaterials["water"] = std::move(water);
 }
