@@ -1,0 +1,14 @@
+{
+  "xmake.additionalConfigArguments": "--cc=clang-cl --cxx=clang-cl",
+  "C_Cpp.codeAnalysis.runAutomatically": false,
+  "C_Cpp.intelliSenseEngine": "Disabled",
+  "C_Cpp.formatting": "Disabled",
+  "clangd.arguments": [
+    "--background-index",
+    "--compile-commands-dir=.",
+    "-j=13",
+    "--clang-tidy",
+    "--header-insertion=iwyu",
+    "--pch-storage=memory",
+  ]
+}

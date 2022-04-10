@@ -4,6 +4,7 @@
 //#include "MathHelper.h"
 #include "DXTrace.h"
 #include "d3dx12.h"
+#include "MathHelper.h"
 #include <D3Dcompiler.h>
 #include <DirectXCollision.h>
 #include <DirectXColors.h>
@@ -23,6 +24,8 @@
 #include <vector>
 #include <windows.h>
 #include <wrl.h>
+
+extern const int gNumFrameResources;
 
 // 使用模板别名(C++11)简化类型名
 template <class T>
@@ -163,6 +166,33 @@ struct MeshGeometry
         VertexBufferUploader = nullptr;
         IndexBufferUploader = nullptr;
     }
+};
+
+struct Material
+{
+    // 便于查找材质的唯一对应名称
+    std::string Name;
+
+    // 本材质的常量缓冲区索引
+    int MatCBIndex = -1;
+
+    // 漫反射纹理在 SRV 堆中的索引。在第 9 章纹理贴图时会用到
+    int DiffuseSrvHeapIndex = -1;
+
+    // 已更新标志（dirty flag，也作脏标志）表示本材质已有变动，而我们也就需要更新常量缓冲区了。
+    // 由于每个帧资源 FrameResource 都有一个材质常量缓冲区，所以必须对每个 FrameResource 都进
+    // 行更新。因此，当修改某个材质时，应当设置 NumFramesDirty = gNumFrameResources，以使每
+    // 个帧资源都能得到更新
+    int NumFramesDirty = gNumFrameResources;
+
+    // 用于着色的材质常量缓冲区数据
+    // 漫反射反照率
+    DirectX::XMFLOAT4 DiffuseAlbedo = { 1.0f, 1.0f, 1.0f, 1.0f };
+    // 材质属性 R_F (0°)
+    DirectX::XMFLOAT3 FresnelR0 = { 0.01f, 0.01f, 0.01f };
+
+    float Roughness = 0.25f;
+    DirectX::XMFLOAT4X4 MatTransform = MathHelper::Identity4x4();
 };
 
 inline std::wstring AnsiToWString(const std::string &str)
