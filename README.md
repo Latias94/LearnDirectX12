@@ -25,4 +25,4 @@ git clone --recurse-submodules -j8 https://github.com/Latias94/LearnDirectX12
 * [《DirectX 12 3D 游戏开发实战》](https://book.douban.com/subject/30426701/)
 * [d3dcoder/d3d12book](https://github.com/d3dcoder/d3d12book)  
 * [DirectX11-With-Windows-SDK-Book](https://mkxjun.github.io/DirectX11-With-Windows-SDK-Book/)
-* []
+* [从零开始手敲次世代游戏引擎](https://zhuanlan.zhihu.com/p/28589792) 系列
