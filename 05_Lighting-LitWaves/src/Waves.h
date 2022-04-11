@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include <DirectXMath.h>
+#include "DirectXMath.h"
 
 class Waves
 {

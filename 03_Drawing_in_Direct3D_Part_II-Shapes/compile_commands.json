@@ -1,13 +1,13 @@
 [
 {
   "directory": "D:\\cpp\\LearnDirectX12\\03_Drawing_in_Direct3D_Part_II-Shapes",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Ox", "/fp:fast", "/std:c++20", "/MD", "/I.", "/I..\\Common", "/I..\\ThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/Zi", "/W0", "/MP", "/Ob2", "/Oi", "/Ot", "/Oy", "/GT", "/GF", "/GS-", "/Gy", "/FS", "/arch:AVX2", "/Gr", "/sdl-", "/GL", "/Zc:preprocessor", "/TP", "/EHsc", "/DNDEBUG", "/Fobuild\\.objs\\03_Drawing_in_Direct3D_Part_II-Shapes\\windows\\x64\\release\\FrameResource.cpp.obj", "FrameResource.cpp"],
-  "file": "FrameResource.cpp"
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Ox", "/fp:fast", "/std:c++20", "/MD", "/I.", "/I..\\Common", "/I..\\ThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/Zi", "/W0", "/MP", "/Ob2", "/Oi", "/Ot", "/Oy", "/GT", "/GF", "/GS-", "/Gy", "/FS", "/arch:AVX2", "/Gr", "/sdl-", "/GL", "/Zc:preprocessor", "/TP", "/EHsc", "/DNDEBUG", "/Fobuild\\.objs\\03_Drawing_in_Direct3D_Part_II-Shapes\\windows\\x64\\release\\src\\FrameResource.cpp.obj", "src\\FrameResource.cpp"],
+  "file": "src\\FrameResource.cpp"
 },
 {
   "directory": "D:\\cpp\\LearnDirectX12\\03_Drawing_in_Direct3D_Part_II-Shapes",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Ox", "/fp:fast", "/std:c++20", "/MD", "/I.", "/I..\\Common", "/I..\\ThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/Zi", "/W0", "/MP", "/Ob2", "/Oi", "/Ot", "/Oy", "/GT", "/GF", "/GS-", "/Gy", "/FS", "/arch:AVX2", "/Gr", "/sdl-", "/GL", "/Zc:preprocessor", "/TP", "/EHsc", "/DNDEBUG", "/Fobuild\\.objs\\03_Drawing_in_Direct3D_Part_II-Shapes\\windows\\x64\\release\\ShapesApp.cpp.obj", "ShapesApp.cpp"],
-  "file": "ShapesApp.cpp"
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Ox", "/fp:fast", "/std:c++20", "/MD", "/I.", "/I..\\Common", "/I..\\ThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/Zi", "/W0", "/MP", "/Ob2", "/Oi", "/Ot", "/Oy", "/GT", "/GF", "/GS-", "/Gy", "/FS", "/arch:AVX2", "/Gr", "/sdl-", "/GL", "/Zc:preprocessor", "/TP", "/EHsc", "/DNDEBUG", "/Fobuild\\.objs\\03_Drawing_in_Direct3D_Part_II-Shapes\\windows\\x64\\release\\src\\ShapesApp.cpp.obj", "src\\ShapesApp.cpp"],
+  "file": "src\\ShapesApp.cpp"
 },
 {
   "directory": "D:\\cpp\\LearnDirectX12\\03_Drawing_in_Direct3D_Part_II-Shapes",

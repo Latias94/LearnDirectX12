@@ -1,13 +1,8 @@
 [
 {
   "directory": "D:\\cpp\\LearnDirectX12\\01_DirectX12_Initialization",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Ox", "/fp:fast", "/std:c++20", "/MD", "/I.", "/I..\\Common", "/I..\\ThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/Zi", "/W0", "/MP", "/Ob2", "/Oi", "/Ot", "/Oy", "/GT", "/GF", "/GS-", "/Gy", "/FS", "/arch:AVX2", "/Gr", "/sdl-", "/GL", "/Zc:preprocessor", "/TP", "/EHsc", "/DNDEBUG", "/Fobuild\\.objs\\01_DirectX12_Initialization\\windows\\x64\\release\\build\\CMakeFiles\\3.23.0\\CompilerIdCXX\\CMakeCXXCompilerId.cpp.obj", "build\\CMakeFiles\\3.23.0\\CompilerIdCXX\\CMakeCXXCompilerId.cpp"],
-  "file": "build\\CMakeFiles\\3.23.0\\CompilerIdCXX\\CMakeCXXCompilerId.cpp"
-},
-{
-  "directory": "D:\\cpp\\LearnDirectX12\\01_DirectX12_Initialization",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Ox", "/fp:fast", "/std:c++20", "/MD", "/I.", "/I..\\Common", "/I..\\ThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/Zi", "/W0", "/MP", "/Ob2", "/Oi", "/Ot", "/Oy", "/GT", "/GF", "/GS-", "/Gy", "/FS", "/arch:AVX2", "/Gr", "/sdl-", "/GL", "/Zc:preprocessor", "/TP", "/EHsc", "/DNDEBUG", "/Fobuild\\.objs\\01_DirectX12_Initialization\\windows\\x64\\release\\InitDirect3DApp.cpp.obj", "InitDirect3DApp.cpp"],
-  "file": "InitDirect3DApp.cpp"
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Ox", "/fp:fast", "/std:c++20", "/MD", "/I.", "/I..\\Common", "/I..\\ThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/Zi", "/W0", "/MP", "/Ob2", "/Oi", "/Ot", "/Oy", "/GT", "/GF", "/GS-", "/Gy", "/FS", "/arch:AVX2", "/Gr", "/sdl-", "/GL", "/Zc:preprocessor", "/TP", "/EHsc", "/DNDEBUG", "/Fobuild\\.objs\\01_DirectX12_Initialization\\windows\\x64\\release\\src\\InitDirect3DApp.cpp.obj", "src\\InitDirect3DApp.cpp"],
+  "file": "src\\InitDirect3DApp.cpp"
 },
 {
   "directory": "D:\\cpp\\LearnDirectX12\\01_DirectX12_Initialization",

@@ -1,8 +1,8 @@
 [
 {
   "directory": "D:\\cpp\\LearnDirectX12\\02_Drawing_in_Direct3D-Box",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Ox", "/fp:fast", "/std:c++20", "/MD", "/I.", "/I..\\Common", "/I..\\ThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/Zi", "/W0", "/MP", "/Ob2", "/Oi", "/Ot", "/Oy", "/GT", "/GF", "/GS-", "/Gy", "/FS", "/arch:AVX2", "/Gr", "/sdl-", "/GL", "/Zc:preprocessor", "/TP", "/EHsc", "/DNDEBUG", "/Fobuild\\.objs\\02_Drawing_in_Direct3D-Box\\windows\\x64\\release\\BoxApp.cpp.obj", "BoxApp.cpp"],
-  "file": "BoxApp.cpp"
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Ox", "/fp:fast", "/std:c++20", "/MD", "/I.", "/I..\\Common", "/I..\\ThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/Zi", "/W0", "/MP", "/Ob2", "/Oi", "/Ot", "/Oy", "/GT", "/GF", "/GS-", "/Gy", "/FS", "/arch:AVX2", "/Gr", "/sdl-", "/GL", "/Zc:preprocessor", "/TP", "/EHsc", "/DNDEBUG", "/Fobuild\\.objs\\02_Drawing_in_Direct3D-Box\\windows\\x64\\release\\src\\BoxApp.cpp.obj", "src\\BoxApp.cpp"],
+  "file": "src\\BoxApp.cpp"
 },
 {
   "directory": "D:\\cpp\\LearnDirectX12\\02_Drawing_in_Direct3D-Box",

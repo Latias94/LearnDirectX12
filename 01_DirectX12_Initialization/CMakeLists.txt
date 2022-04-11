@@ -22,19 +22,33 @@ add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 file(GLOB HEADER_FILES ./*.h)
 
 set(COMMON_SRC "../Common")
+set(THIRDPARTY_SRC "../ThirdParty")
+set(DIRECTXMATH_SRC "${THIRDPARTY_SRC}/DirectXMath")
 
-aux_source_directory(. DIR_SRCS)
+aux_source_directory(src DIR_SRCS)
 aux_source_directory(${COMMON_SRC} COMMON_SOURCES)
+aux_source_directory(${DIRECTXMATH_SRC} DIRECTXMATH_SOURCES)
 
 LIST(APPEND ALL_SRC
         ${DIR_SRCS}
         ${COMMON_SOURCES}
+        ${DIRECTXMATH_SOURCES}
+        )
+
+set(DIRECTXMATH_INCLUDE "${DIRECTXMATH_SRC}/Inc")
+
+LIST(APPEND ALL_INCLUDE
+        ${COMMON_SRC}
+        ${DIRECTXMATH_INCLUDE}
         )
 
 add_executable(${TARGET_NAME} WIN32 ${ALL_SRC} ${HEADER_FILES})
 
 target_link_libraries(${TARGET_NAME} d3d12.lib d3d11.lib dxgi.lib dxguid.lib d3dcompiler.lib winmm.lib)
-target_include_directories(${TARGET_NAME} PRIVATE ${COMMON_SRC})
+target_include_directories(${TARGET_NAME} PRIVATE ${ALL_INCLUDE})
+
+# 指定异常处理模型，使项目支持 clang-cl 编译
+target_compile_options (${TARGET_NAME} PUBLIC -EHsc)
 
 #message(STATUS "all src: ${ALL_SRC}")
 #message(STATUS "common include dir: ${COMMON_SRC}")

@@ -13,13 +13,7 @@ git clone --recurse-submodules -j8 https://github.com/Latias94/LearnDirectX12
 
 ## Build
 
-* Clion with MSVC toolchain
-* [Visual Studio 中的 CMake 项目](https://docs.microsoft.com/zh-cn/cpp/build/cmake-projects-in-visual-studio?view=msvc-170&viewFallbackFrom=vs-2019)
-* `cmake -G "Visual Studio 17 2022" -A x64` or other target mentioned in [doc](https://cmake.org/cmake/help/latest/generator/Visual%20Studio%2017%202022.html)
-* install [XMake](https://xmake.io/) and Clang
-  * `cd '.\01_DirectX12_Initialization\'` `xmake && xmake run`
-  * ref: [Windows渲染引擎开发入门教学（4.5）: 更舒适的编译流程](https://zhuanlan.zhihu.com/p/495864590)
-  * vscode 安装 Clangd 插件，`cd '.\01_DirectX12_Initialization\'` `code .`
+[Build](misc/notes/Build.md)
 
 ## Reference
 
