@@ -24,10 +24,11 @@ xmake && xmake run  # auto detect compiler
 ```
 
 ```shell
-cd .\01_DirectX12_Initialization\
-xmake f -p windows -a x64 -m debug --cc=clang-cl --cxx=clang-cl
-xmake -w # compile and print warning
+cd .\LearnDirectX12\
+xmake build -w t01 # compile 01_DirectX12_Initialization
+xmake r t01 # run 01_DirectX12_Initialization
 ```
+
 ref: [Windows渲染引擎开发入门教学（4.5）: 更舒适的编译流程](https://zhuanlan.zhihu.com/p/495864590)
 
 ## VSCode

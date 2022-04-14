@@ -1,0 +1,326 @@
+[
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I01_DirectX12_Initialization", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t01\\windows\\x64\\debug\\01_DirectX12_Initialization\\src\\InitDirect3DApp.cpp.obj", "01_DirectX12_Initialization\\src\\InitDirect3DApp.cpp"],
+  "file": "01_DirectX12_Initialization\\src\\InitDirect3DApp.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I01_DirectX12_Initialization", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t01\\windows\\x64\\debug\\Common\\D3DApp.cpp.obj", "Common\\D3DApp.cpp"],
+  "file": "Common\\D3DApp.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I01_DirectX12_Initialization", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t01\\windows\\x64\\debug\\Common\\d3dUtil.cpp.obj", "Common\\d3dUtil.cpp"],
+  "file": "Common\\d3dUtil.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I01_DirectX12_Initialization", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t01\\windows\\x64\\debug\\Common\\DXTrace.cpp.obj", "Common\\DXTrace.cpp"],
+  "file": "Common\\DXTrace.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I01_DirectX12_Initialization", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t01\\windows\\x64\\debug\\Common\\GameTimer.cpp.obj", "Common\\GameTimer.cpp"],
+  "file": "Common\\GameTimer.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I01_DirectX12_Initialization", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t01\\windows\\x64\\debug\\Common\\GeometryGenerator.cpp.obj", "Common\\GeometryGenerator.cpp"],
+  "file": "Common\\GeometryGenerator.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I01_DirectX12_Initialization", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t01\\windows\\x64\\debug\\Common\\logger.cpp.obj", "Common\\logger.cpp"],
+  "file": "Common\\logger.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I01_DirectX12_Initialization", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t01\\windows\\x64\\debug\\Common\\MathHelper.cpp.obj", "Common\\MathHelper.cpp"],
+  "file": "Common\\MathHelper.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I01_DirectX12_Initialization", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t01\\windows\\x64\\debug\\ThirdParty\\DirectXMath\\SHMath\\DirectXSH.cpp.obj", "ThirdParty\\DirectXMath\\SHMath\\DirectXSH.cpp"],
+  "file": "ThirdParty\\DirectXMath\\SHMath\\DirectXSH.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I01_DirectX12_Initialization", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t01\\windows\\x64\\debug\\ThirdParty\\DirectXMath\\SHMath\\DirectXSHD3D11.cpp.obj", "ThirdParty\\DirectXMath\\SHMath\\DirectXSHD3D11.cpp"],
+  "file": "ThirdParty\\DirectXMath\\SHMath\\DirectXSHD3D11.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I01_DirectX12_Initialization", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t01\\windows\\x64\\debug\\ThirdParty\\DirectXMath\\SHMath\\DirectXSHD3D12.cpp.obj", "ThirdParty\\DirectXMath\\SHMath\\DirectXSHD3D12.cpp"],
+  "file": "ThirdParty\\DirectXMath\\SHMath\\DirectXSHD3D12.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I01_DirectX12_Initialization", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t01\\windows\\x64\\debug\\ThirdParty\\DirectXMath\\Stereo3D\\Stereo3DMatrixHelper.cpp.obj", "ThirdParty\\DirectXMath\\Stereo3D\\Stereo3DMatrixHelper.cpp"],
+  "file": "ThirdParty\\DirectXMath\\Stereo3D\\Stereo3DMatrixHelper.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I02_Drawing_in_Direct3D-Box", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t02\\windows\\x64\\debug\\02_Drawing_in_Direct3D-Box\\src\\BoxApp.cpp.obj", "02_Drawing_in_Direct3D-Box\\src\\BoxApp.cpp"],
+  "file": "02_Drawing_in_Direct3D-Box\\src\\BoxApp.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I02_Drawing_in_Direct3D-Box", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t02\\windows\\x64\\debug\\Common\\D3DApp.cpp.obj", "Common\\D3DApp.cpp"],
+  "file": "Common\\D3DApp.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I02_Drawing_in_Direct3D-Box", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t02\\windows\\x64\\debug\\Common\\d3dUtil.cpp.obj", "Common\\d3dUtil.cpp"],
+  "file": "Common\\d3dUtil.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I02_Drawing_in_Direct3D-Box", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t02\\windows\\x64\\debug\\Common\\DXTrace.cpp.obj", "Common\\DXTrace.cpp"],
+  "file": "Common\\DXTrace.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I02_Drawing_in_Direct3D-Box", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t02\\windows\\x64\\debug\\Common\\GameTimer.cpp.obj", "Common\\GameTimer.cpp"],
+  "file": "Common\\GameTimer.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I02_Drawing_in_Direct3D-Box", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t02\\windows\\x64\\debug\\Common\\GeometryGenerator.cpp.obj", "Common\\GeometryGenerator.cpp"],
+  "file": "Common\\GeometryGenerator.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I02_Drawing_in_Direct3D-Box", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t02\\windows\\x64\\debug\\Common\\logger.cpp.obj", "Common\\logger.cpp"],
+  "file": "Common\\logger.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I02_Drawing_in_Direct3D-Box", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t02\\windows\\x64\\debug\\Common\\MathHelper.cpp.obj", "Common\\MathHelper.cpp"],
+  "file": "Common\\MathHelper.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I02_Drawing_in_Direct3D-Box", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t02\\windows\\x64\\debug\\ThirdParty\\DirectXMath\\SHMath\\DirectXSH.cpp.obj", "ThirdParty\\DirectXMath\\SHMath\\DirectXSH.cpp"],
+  "file": "ThirdParty\\DirectXMath\\SHMath\\DirectXSH.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I02_Drawing_in_Direct3D-Box", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t02\\windows\\x64\\debug\\ThirdParty\\DirectXMath\\SHMath\\DirectXSHD3D11.cpp.obj", "ThirdParty\\DirectXMath\\SHMath\\DirectXSHD3D11.cpp"],
+  "file": "ThirdParty\\DirectXMath\\SHMath\\DirectXSHD3D11.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I02_Drawing_in_Direct3D-Box", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t02\\windows\\x64\\debug\\ThirdParty\\DirectXMath\\SHMath\\DirectXSHD3D12.cpp.obj", "ThirdParty\\DirectXMath\\SHMath\\DirectXSHD3D12.cpp"],
+  "file": "ThirdParty\\DirectXMath\\SHMath\\DirectXSHD3D12.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I02_Drawing_in_Direct3D-Box", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t02\\windows\\x64\\debug\\ThirdParty\\DirectXMath\\Stereo3D\\Stereo3DMatrixHelper.cpp.obj", "ThirdParty\\DirectXMath\\Stereo3D\\Stereo3DMatrixHelper.cpp"],
+  "file": "ThirdParty\\DirectXMath\\Stereo3D\\Stereo3DMatrixHelper.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I05_Lighting-LitWaves", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t05\\windows\\x64\\debug\\05_Lighting-LitWaves\\src\\FrameResource.cpp.obj", "05_Lighting-LitWaves\\src\\FrameResource.cpp"],
+  "file": "05_Lighting-LitWaves\\src\\FrameResource.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I05_Lighting-LitWaves", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t05\\windows\\x64\\debug\\05_Lighting-LitWaves\\src\\LitWavesApp.cpp.obj", "05_Lighting-LitWaves\\src\\LitWavesApp.cpp"],
+  "file": "05_Lighting-LitWaves\\src\\LitWavesApp.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I05_Lighting-LitWaves", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t05\\windows\\x64\\debug\\05_Lighting-LitWaves\\src\\Waves.cpp.obj", "05_Lighting-LitWaves\\src\\Waves.cpp"],
+  "file": "05_Lighting-LitWaves\\src\\Waves.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I05_Lighting-LitWaves", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t05\\windows\\x64\\debug\\Common\\D3DApp.cpp.obj", "Common\\D3DApp.cpp"],
+  "file": "Common\\D3DApp.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I05_Lighting-LitWaves", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t05\\windows\\x64\\debug\\Common\\d3dUtil.cpp.obj", "Common\\d3dUtil.cpp"],
+  "file": "Common\\d3dUtil.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I05_Lighting-LitWaves", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t05\\windows\\x64\\debug\\Common\\DXTrace.cpp.obj", "Common\\DXTrace.cpp"],
+  "file": "Common\\DXTrace.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I05_Lighting-LitWaves", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t05\\windows\\x64\\debug\\Common\\GameTimer.cpp.obj", "Common\\GameTimer.cpp"],
+  "file": "Common\\GameTimer.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I05_Lighting-LitWaves", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t05\\windows\\x64\\debug\\Common\\GeometryGenerator.cpp.obj", "Common\\GeometryGenerator.cpp"],
+  "file": "Common\\GeometryGenerator.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I05_Lighting-LitWaves", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t05\\windows\\x64\\debug\\Common\\logger.cpp.obj", "Common\\logger.cpp"],
+  "file": "Common\\logger.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I05_Lighting-LitWaves", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t05\\windows\\x64\\debug\\Common\\MathHelper.cpp.obj", "Common\\MathHelper.cpp"],
+  "file": "Common\\MathHelper.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I05_Lighting-LitWaves", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t05\\windows\\x64\\debug\\ThirdParty\\DirectXMath\\SHMath\\DirectXSH.cpp.obj", "ThirdParty\\DirectXMath\\SHMath\\DirectXSH.cpp"],
+  "file": "ThirdParty\\DirectXMath\\SHMath\\DirectXSH.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I05_Lighting-LitWaves", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t05\\windows\\x64\\debug\\ThirdParty\\DirectXMath\\SHMath\\DirectXSHD3D11.cpp.obj", "ThirdParty\\DirectXMath\\SHMath\\DirectXSHD3D11.cpp"],
+  "file": "ThirdParty\\DirectXMath\\SHMath\\DirectXSHD3D11.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I05_Lighting-LitWaves", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t05\\windows\\x64\\debug\\ThirdParty\\DirectXMath\\SHMath\\DirectXSHD3D12.cpp.obj", "ThirdParty\\DirectXMath\\SHMath\\DirectXSHD3D12.cpp"],
+  "file": "ThirdParty\\DirectXMath\\SHMath\\DirectXSHD3D12.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I05_Lighting-LitWaves", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t05\\windows\\x64\\debug\\ThirdParty\\DirectXMath\\Stereo3D\\Stereo3DMatrixHelper.cpp.obj", "ThirdParty\\DirectXMath\\Stereo3D\\Stereo3DMatrixHelper.cpp"],
+  "file": "ThirdParty\\DirectXMath\\Stereo3D\\Stereo3DMatrixHelper.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I04_Drawing_in_Direct3D_Part_II-LandAndWaves", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t04\\windows\\x64\\debug\\04_Drawing_in_Direct3D_Part_II-LandAndWaves\\src\\FrameResource.cpp.obj", "04_Drawing_in_Direct3D_Part_II-LandAndWaves\\src\\FrameResource.cpp"],
+  "file": "04_Drawing_in_Direct3D_Part_II-LandAndWaves\\src\\FrameResource.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I04_Drawing_in_Direct3D_Part_II-LandAndWaves", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t04\\windows\\x64\\debug\\04_Drawing_in_Direct3D_Part_II-LandAndWaves\\src\\LandAndWavesApp.cpp.obj", "04_Drawing_in_Direct3D_Part_II-LandAndWaves\\src\\LandAndWavesApp.cpp"],
+  "file": "04_Drawing_in_Direct3D_Part_II-LandAndWaves\\src\\LandAndWavesApp.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I04_Drawing_in_Direct3D_Part_II-LandAndWaves", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t04\\windows\\x64\\debug\\04_Drawing_in_Direct3D_Part_II-LandAndWaves\\src\\Waves.cpp.obj", "04_Drawing_in_Direct3D_Part_II-LandAndWaves\\src\\Waves.cpp"],
+  "file": "04_Drawing_in_Direct3D_Part_II-LandAndWaves\\src\\Waves.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I04_Drawing_in_Direct3D_Part_II-LandAndWaves", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t04\\windows\\x64\\debug\\Common\\D3DApp.cpp.obj", "Common\\D3DApp.cpp"],
+  "file": "Common\\D3DApp.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I04_Drawing_in_Direct3D_Part_II-LandAndWaves", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t04\\windows\\x64\\debug\\Common\\d3dUtil.cpp.obj", "Common\\d3dUtil.cpp"],
+  "file": "Common\\d3dUtil.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I04_Drawing_in_Direct3D_Part_II-LandAndWaves", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t04\\windows\\x64\\debug\\Common\\DXTrace.cpp.obj", "Common\\DXTrace.cpp"],
+  "file": "Common\\DXTrace.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I04_Drawing_in_Direct3D_Part_II-LandAndWaves", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t04\\windows\\x64\\debug\\Common\\GameTimer.cpp.obj", "Common\\GameTimer.cpp"],
+  "file": "Common\\GameTimer.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I04_Drawing_in_Direct3D_Part_II-LandAndWaves", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t04\\windows\\x64\\debug\\Common\\GeometryGenerator.cpp.obj", "Common\\GeometryGenerator.cpp"],
+  "file": "Common\\GeometryGenerator.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I04_Drawing_in_Direct3D_Part_II-LandAndWaves", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t04\\windows\\x64\\debug\\Common\\logger.cpp.obj", "Common\\logger.cpp"],
+  "file": "Common\\logger.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I04_Drawing_in_Direct3D_Part_II-LandAndWaves", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t04\\windows\\x64\\debug\\Common\\MathHelper.cpp.obj", "Common\\MathHelper.cpp"],
+  "file": "Common\\MathHelper.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I04_Drawing_in_Direct3D_Part_II-LandAndWaves", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t04\\windows\\x64\\debug\\ThirdParty\\DirectXMath\\SHMath\\DirectXSH.cpp.obj", "ThirdParty\\DirectXMath\\SHMath\\DirectXSH.cpp"],
+  "file": "ThirdParty\\DirectXMath\\SHMath\\DirectXSH.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I04_Drawing_in_Direct3D_Part_II-LandAndWaves", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t04\\windows\\x64\\debug\\ThirdParty\\DirectXMath\\SHMath\\DirectXSHD3D11.cpp.obj", "ThirdParty\\DirectXMath\\SHMath\\DirectXSHD3D11.cpp"],
+  "file": "ThirdParty\\DirectXMath\\SHMath\\DirectXSHD3D11.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I04_Drawing_in_Direct3D_Part_II-LandAndWaves", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t04\\windows\\x64\\debug\\ThirdParty\\DirectXMath\\SHMath\\DirectXSHD3D12.cpp.obj", "ThirdParty\\DirectXMath\\SHMath\\DirectXSHD3D12.cpp"],
+  "file": "ThirdParty\\DirectXMath\\SHMath\\DirectXSHD3D12.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I04_Drawing_in_Direct3D_Part_II-LandAndWaves", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t04\\windows\\x64\\debug\\ThirdParty\\DirectXMath\\Stereo3D\\Stereo3DMatrixHelper.cpp.obj", "ThirdParty\\DirectXMath\\Stereo3D\\Stereo3DMatrixHelper.cpp"],
+  "file": "ThirdParty\\DirectXMath\\Stereo3D\\Stereo3DMatrixHelper.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I03_Drawing_in_Direct3D_Part_II-Shapes", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t03\\windows\\x64\\debug\\03_Drawing_in_Direct3D_Part_II-Shapes\\src\\FrameResource.cpp.obj", "03_Drawing_in_Direct3D_Part_II-Shapes\\src\\FrameResource.cpp"],
+  "file": "03_Drawing_in_Direct3D_Part_II-Shapes\\src\\FrameResource.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I03_Drawing_in_Direct3D_Part_II-Shapes", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t03\\windows\\x64\\debug\\03_Drawing_in_Direct3D_Part_II-Shapes\\src\\ShapesApp.cpp.obj", "03_Drawing_in_Direct3D_Part_II-Shapes\\src\\ShapesApp.cpp"],
+  "file": "03_Drawing_in_Direct3D_Part_II-Shapes\\src\\ShapesApp.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I03_Drawing_in_Direct3D_Part_II-Shapes", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t03\\windows\\x64\\debug\\Common\\D3DApp.cpp.obj", "Common\\D3DApp.cpp"],
+  "file": "Common\\D3DApp.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I03_Drawing_in_Direct3D_Part_II-Shapes", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t03\\windows\\x64\\debug\\Common\\d3dUtil.cpp.obj", "Common\\d3dUtil.cpp"],
+  "file": "Common\\d3dUtil.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I03_Drawing_in_Direct3D_Part_II-Shapes", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t03\\windows\\x64\\debug\\Common\\DXTrace.cpp.obj", "Common\\DXTrace.cpp"],
+  "file": "Common\\DXTrace.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I03_Drawing_in_Direct3D_Part_II-Shapes", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t03\\windows\\x64\\debug\\Common\\GameTimer.cpp.obj", "Common\\GameTimer.cpp"],
+  "file": "Common\\GameTimer.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I03_Drawing_in_Direct3D_Part_II-Shapes", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t03\\windows\\x64\\debug\\Common\\GeometryGenerator.cpp.obj", "Common\\GeometryGenerator.cpp"],
+  "file": "Common\\GeometryGenerator.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I03_Drawing_in_Direct3D_Part_II-Shapes", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t03\\windows\\x64\\debug\\Common\\logger.cpp.obj", "Common\\logger.cpp"],
+  "file": "Common\\logger.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I03_Drawing_in_Direct3D_Part_II-Shapes", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t03\\windows\\x64\\debug\\Common\\MathHelper.cpp.obj", "Common\\MathHelper.cpp"],
+  "file": "Common\\MathHelper.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I03_Drawing_in_Direct3D_Part_II-Shapes", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t03\\windows\\x64\\debug\\ThirdParty\\DirectXMath\\SHMath\\DirectXSH.cpp.obj", "ThirdParty\\DirectXMath\\SHMath\\DirectXSH.cpp"],
+  "file": "ThirdParty\\DirectXMath\\SHMath\\DirectXSH.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I03_Drawing_in_Direct3D_Part_II-Shapes", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t03\\windows\\x64\\debug\\ThirdParty\\DirectXMath\\SHMath\\DirectXSHD3D11.cpp.obj", "ThirdParty\\DirectXMath\\SHMath\\DirectXSHD3D11.cpp"],
+  "file": "ThirdParty\\DirectXMath\\SHMath\\DirectXSHD3D11.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I03_Drawing_in_Direct3D_Part_II-Shapes", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t03\\windows\\x64\\debug\\ThirdParty\\DirectXMath\\SHMath\\DirectXSHD3D12.cpp.obj", "ThirdParty\\DirectXMath\\SHMath\\DirectXSHD3D12.cpp"],
+  "file": "ThirdParty\\DirectXMath\\SHMath\\DirectXSHD3D12.cpp"
+},
+{
+  "directory": "D:\\DirectX\\LearnDirectX12",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/Od", "/std:c++20", "/MDd", "/I03_Drawing_in_Direct3D_Part_II-Shapes", "/ICommon", "/IThirdParty\\DirectXMath\\Inc", "/D_XM_NO_INTRINSICS_=1", "/DNOMINMAX", "/DUNICODE", "/Dm128_f32=vector4_f32", "/Dm128_u32=vector4_u32", "/D_DEBUG", "/Zi", "/W0", "/MP", "/Ob0", "/Oy-", "/GF", "/GS", "/arch:AVX2", "/Gr", "/TP", "/FS", "/Zc:preprocessor", "/EHsc", "/Fobuild\\.objs\\t03\\windows\\x64\\debug\\ThirdParty\\DirectXMath\\Stereo3D\\Stereo3DMatrixHelper.cpp.obj", "ThirdParty\\DirectXMath\\Stereo3D\\Stereo3DMatrixHelper.cpp"],
+  "file": "ThirdParty\\DirectXMath\\Stereo3D\\Stereo3DMatrixHelper.cpp"
+}]
